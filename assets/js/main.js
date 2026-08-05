@@ -1,0 +1,632 @@
+/* =========================================================================
+   Portfolio v2 — interactions & rendering
+   Static 2D tech map (logos + line-work) · static swarm schematic.
+   ========================================================================= */
+(function () {
+  "use strict";
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const $ = (s, c = document) => c.querySelector(s);
+  const $$ = (s, c = document) => Array.from(c.querySelectorAll(s));
+  const SVGNS = "http://www.w3.org/2000/svg";
+  const LOGO = "assets/logos/";
+
+  /* ---- icon markup (logo file or drawn glyph) ------------------------- */
+  function iconMarkup(icon, label) {
+    if (icon && icon.indexOf("glyph:") === 0) {
+      const g = (typeof ICON_GLYPHS !== "undefined" && ICON_GLYPHS[icon.slice(6)]) || "";
+      return `<span class="ic ic--glyph">${g}</span>`;
+    }
+    return `<img class="ic" src="${LOGO}${icon}.svg" alt="${label}" loading="lazy" decoding="async" />`;
+  }
+
+  /* ====================================================================
+     ARCHITECTURE MAP — components (logos) + a request flowing through,
+     with responses coming back. The animation = real data flow.
+     ==================================================================== */
+  function renderMap(box, D) {
+    if (!box || !D || !D.nodes) return;
+    box.textContent = "";
+    const byId = Object.fromEntries(D.nodes.map((n) => [n.id, n]));
+    const adj = Object.fromEntries(D.nodes.map((n) => [n.id, new Set()]));
+    const groups = D.groups || [];
+    const groupLinks = D.groupLinks || [];
+
+    // --- group bounding boxes (from member node positions) ---
+    const bboxes = {};
+    groups.forEach((g) => {
+      const mem = D.nodes.filter((n) => n.group === g.id);
+      if (!mem.length) return;
+      let minX = 100, minY = 100, maxX = 0, maxY = 0;
+      mem.forEach((n) => { minX = Math.min(minX, n.x); maxX = Math.max(maxX, n.x); minY = Math.min(minY, n.y); maxY = Math.max(maxY, n.y); });
+      const bx = Math.max(minX - 6, 0.5), by = Math.max(minY - 13, 1.5);
+      bboxes[g.id] = { x: bx, y: by, w: Math.min(maxX + 6, 99.5) - bx, h: Math.min(maxY + 9, 99) - by };
+    });
+
+    // --- group boxes (lowest layer) ---
+    groups.forEach((g) => {
+      const b = bboxes[g.id]; if (!b) return;
+      const el = document.createElement("div");
+      el.className = "arch-group group-" + g.id;
+      el.style.left = b.x + "%"; el.style.top = b.y + "%";
+      el.style.width = b.w + "%"; el.style.height = b.h + "%";
+      el.style.setProperty("--gacc", g.accent);
+      el.innerHTML = `<span class="arch-group__label">${g.label}</span>`;
+      box.appendChild(el);
+    });
+
+    // anchor helpers for group-level links
+    const ctrOf = (ep) => ep.indexOf("g:") === 0
+      ? { x: bboxes[ep.slice(2)].x + bboxes[ep.slice(2)].w / 2, y: bboxes[ep.slice(2)].y + bboxes[ep.slice(2)].h / 2 }
+      : { x: byId[ep].x, y: byId[ep].y };
+    const borderPt = (b, t) => {
+      const cx = b.x + b.w / 2, cy = b.y + b.h / 2, dx = t.x - cx, dy = t.y - cy;
+      if (!dx && !dy) return { x: cx, y: cy };
+      const s = Math.min(dx ? (b.w / 2) / Math.abs(dx) : 1e9, dy ? (b.h / 2) / Math.abs(dy) : 1e9);
+      return { x: cx + dx * s, y: cy + dy * s };
+    };
+    const ptOf = (ep, towards) => ep.indexOf("g:") === 0 ? borderPt(bboxes[ep.slice(2)], towards) : { x: byId[ep].x, y: byId[ep].y };
+
+    // --- lines (svg above boxes, below nodes) ---
+    const svg = document.createElementNS(SVGNS, "svg");
+    svg.setAttribute("class", "archmap__lines");
+    svg.setAttribute("viewBox", "0 0 100 100");
+    svg.setAttribute("preserveAspectRatio", "none");
+    svg.setAttribute("aria-hidden", "true");
+    const lineEls = [];
+    const drawLine = (a, b, kind, grouplink) => {
+      const ln = document.createElementNS(SVGNS, "line");
+      ln.setAttribute("x1", a.x); ln.setAttribute("y1", a.y);
+      ln.setAttribute("x2", b.x); ln.setAttribute("y2", b.y);
+      ln.setAttribute("vector-effect", "non-scaling-stroke");
+      ln.setAttribute("class", "archmap__line " + (kind !== "flow" ? "kind-" + kind : "tier-flow") + (grouplink ? " is-grouplink" : ""));
+      svg.appendChild(ln);
+      return ln;
+    };
+    // node-level edges (inside groups)
+    (D.edges || []).forEach((e) => {
+      const a = byId[e.from], b = byId[e.to];
+      if (!a || !b) return;
+      adj[e.from].add(e.to); adj[e.to].add(e.from);
+      const ln = drawLine(a, b, e.kind || "flow", false);
+      ln.classList.remove("tier-flow");
+      ln.classList.add("tier-" + b.tier);
+      lineEls.push({ el: ln, a: e.from, b: e.to });
+    });
+    // group-level links
+    groupLinks.forEach((gl) => {
+      const A = ptOf(gl.from, ctrOf(gl.to));
+      const B = ptOf(gl.to, ctrOf(gl.from));
+      drawLine(A, B, gl.kind || "flow", true);
+      gl._A = A; gl._B = B;
+    });
+    box.appendChild(svg);
+
+    // --- nodes ---
+    const nodeEls = {};
+    D.nodes.forEach((n) => {
+      const el = document.createElement("div");
+      el.className = "arch-node tier-" + n.tier + (n.big ? " is-big" : "") + (n.hero ? " is-hero" : "") + (n.hub ? " is-hub" : "");
+      el.style.left = n.x + "%"; el.style.top = n.y + "%";
+      el.dataset.id = n.id;
+      const subs = (n.sub || []).map((s) => `<img class="ic ic--sub" src="${LOGO}${s}.svg" alt="${s}" loading="lazy" decoding="async"/>`).join("");
+      el.innerHTML =
+        `<span class="arch-chip">${iconMarkup(n.icon, n.role)}</span>` +
+        (subs ? `<span class="arch-subs">${subs}</span>` : "") +
+        `<span class="arch-role">${n.role}</span>`;
+      box.appendChild(el);
+      nodeEls[n.id] = el;
+      el.addEventListener("mouseenter", () => highlight(n.id));
+      el.addEventListener("mouseleave", clearHi);
+    });
+
+    function highlight(id) {
+      box.classList.add("has-hover");
+      Object.entries(nodeEls).forEach(([nid, el]) => {
+        el.classList.toggle("is-hot", nid === id);
+        el.classList.toggle("is-lit", adj[id].has(nid));
+      });
+      lineEls.forEach((l) => l.el.classList.toggle("is-lit", l.a === id || l.b === id));
+    }
+    function clearHi() {
+      box.classList.remove("has-hover");
+      Object.values(nodeEls).forEach((el) => el.classList.remove("is-hot", "is-lit"));
+      lineEls.forEach((l) => l.el.classList.remove("is-lit"));
+    }
+
+    if (D.badge) {
+      const bd = document.createElement("div");
+      bd.className = "arch-badge";
+      bd.innerHTML = `<span class="arch-badge__ic">${iconMarkup(D.badge.icon, D.badge.label)}</span><span class="arch-badge__label">${D.badge.label}</span>`;
+      box.appendChild(bd);
+    }
+
+    if (D.hint) {
+      const hint = document.createElement("div");
+      hint.className = "techmap__hint";
+      hint.innerHTML = D.hint;
+      box.appendChild(hint);
+    }
+
+    // --- travelling packets ---
+    if (!reduce) {
+      const layer = document.createElement("div");
+      layer.className = "arch-packets";
+      box.appendChild(layer);
+      const packets = [];
+      const addPackets = (a, b, ret, kind, i, opts) => {
+        const color = packetColor(kind, opts.fromN, opts.toN, opts.accent);
+        packets.push(makePacket(layer, a, b, (i * 0.11) % 1, { color, kind, big: opts.big }));
+        if (ret) packets.push(makePacket(layer, b, a, (i * 0.17 + 0.55) % 1, { color, kind, big: opts.big, ret: true }));
+      };
+      (D.edges || []).forEach((e, i) => {
+        const a = byId[e.from], b = byId[e.to];
+        if (a && b) addPackets(a, b, e.ret, e.kind || "flow", i, { fromN: a, toN: b, big: false });
+      });
+      groupLinks.forEach((gl, i) => {
+        const acc = (typeof gl.to === "string" && gl.to.indexOf("g:") === 0) ? (groups.find((g) => g.id === gl.to.slice(2)) || {}).accent : null;
+        addPackets(gl._A, gl._B, gl.ret, gl.kind || "flow", i + 40, { accent: acc, big: true });
+      });
+      runPackets(packets);
+    }
+  }
+
+  /* packet colour by communication channel (v4) */
+  const CHAN = {
+    user: "#fbbf24", app: "#22d3ee", data: "#34d399",
+    chain: "#818cf8", ai: "#f472b6", infra: "#94a3b8",
+    control: "#f4c560", assist: "#a78bfa",
+  };
+  function flowChannel(fromN, toN) {
+    if ((fromN && fromN.id === "client") || (toN && toN.id === "client")) return CHAN.user;
+    const t = [fromN && fromN.tier, toN && toN.tier];
+    if (t.includes("web3")) return CHAN.chain;
+    if (t.includes("data")) return CHAN.data;
+    if (t.includes("ai")) return CHAN.ai;
+    if (t.includes("infra")) return CHAN.infra;
+    return CHAN.app;
+  }
+  function packetColor(kind, fromN, toN, accent) {
+    if (kind === "control") return CHAN.control;
+    if (kind === "assist") return CHAN.assist;
+    if (fromN || toN) return flowChannel(fromN, toN);
+    return accent ? "rgb(" + accent + ")" : CHAN.app;
+  }
+
+  function makePacket(layer, from, to, t0, opts) {
+    opts = opts || {};
+    const el = document.createElement("span");
+    el.className = "arch-packet";
+    const sz = opts.ret ? (opts.big ? 6 : 5) : (opts.big ? 8 : 7);
+    el.style.width = el.style.height = sz + "px";
+    if (opts.color) {
+      el.style.background = opts.color;
+      el.style.boxShadow = "0 0 8px " + opts.color;
+      if (opts.ret) el.style.opacity = "0.72";
+    }
+    layer.appendChild(el);
+    const len = Math.hypot(to.x - from.x, to.y - from.y) || 1;
+    const slow = opts.kind === "assist" ? 0.6 : opts.kind === "control" ? 0.5 : 1;
+    return { el, fx: from.x, fy: from.y, dx: to.x - from.x, dy: to.y - from.y, t: t0, sp: Math.min(18 / len, 0.42) * slow };
+  }
+
+  function runPackets(packets) {
+    let raf, last = 0;
+    function tick(now) {
+      const dt = last ? Math.min((now - last) / 1000, 0.05) : 0;
+      last = now;
+      for (const p of packets) {
+        p.t += dt * p.sp;
+        if (p.t > 1) p.t -= 1;
+        const e = p.t * p.t * (3 - 2 * p.t); // ease-in-out so packets ease at nodes
+        p.el.style.left = (p.fx + p.dx * e) + "%";
+        p.el.style.top = (p.fy + p.dy * e) + "%";
+      }
+      raf = requestAnimationFrame(tick);
+    }
+    raf = requestAnimationFrame(tick);
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) cancelAnimationFrame(raf);
+      else { last = 0; raf = requestAnimationFrame(tick); }
+    });
+  }
+
+  /* ====================================================================
+     SWARM MAP — orchestrator → parallel agents (static schematic)
+     ==================================================================== */
+  function renderWorkshift() {
+    const box = $("#workshift");
+    if (!box || typeof WORKSHIFT === "undefined") return;
+    box.innerHTML =
+      WORKSHIFT.map((w, i) =>
+        '<div class="workshift__row" style="--d:' + (i * 140) + 'ms">' +
+          '<span class="workshift__pct wf-' + i + '">' + w.pct + '%</span>' +
+          '<div class="workshift__track"><span class="workshift__fill wf-' + i + '" style="--w:' + Math.min(w.pct, 100) + '%"></span></div>' +
+          '<span class="workshift__label">' + w.label + '<em>' + w.note + '</em></span>' +
+        '</div>').join("");
+  }
+
+  function renderSwarmMap() {
+    const box = $("#swarmMap");
+    if (!box || typeof SWARM_AGENTS === "undefined") return;
+    box.textContent = "";
+    const orch = { x: 15, y: 50 };
+    const n = SWARM_AGENTS.length;
+    const agents = SWARM_AGENTS.map((label, i) => {
+      const y = 12 + (i * (76 / (n - 1)));
+      const dist = Math.abs(i - (n - 1) / 2) / ((n - 1) / 2);
+      const x = 75 - dist * 3;
+      return { label, x, y };
+    });
+
+    const svg = document.createElementNS(SVGNS, "svg");
+    svg.setAttribute("class", "swarmmap__lines");
+    svg.setAttribute("viewBox", "0 0 100 100");
+    svg.setAttribute("preserveAspectRatio", "none");
+    svg.setAttribute("aria-hidden", "true");
+    agents.forEach((a) => {
+      const ln = document.createElementNS(SVGNS, "line");
+      ln.setAttribute("x1", orch.x); ln.setAttribute("y1", orch.y);
+      ln.setAttribute("x2", a.x); ln.setAttribute("y2", a.y);
+      ln.setAttribute("vector-effect", "non-scaling-stroke");
+      ln.setAttribute("class", "swarmmap__line" + (reduce ? "" : " is-flow"));
+      svg.appendChild(ln);
+    });
+    box.appendChild(svg);
+
+    const o = document.createElement("div");
+    o.className = "swarmmap__orch";
+    o.style.left = orch.x + "%"; o.style.top = orch.y + "%";
+    o.innerHTML = `<span class="swarmmap__core">${(typeof ICON_GLYPHS !== "undefined" && ICON_GLYPHS.orch) || ""}</span><span class="swarmmap__olabel">Orchestrator</span>`;
+    box.appendChild(o);
+
+    agents.forEach((a, i) => {
+      const el = document.createElement("div");
+      el.className = "swarmmap__agent";
+      el.style.left = a.x + "%"; el.style.top = a.y + "%";
+      el.style.setProperty("--i", i);
+      el.innerHTML = `<span class="swarmmap__dot"></span><span class="swarmmap__alabel">${a.label}</span>`;
+      box.appendChild(el);
+    });
+  }
+
+  /* ---- content cards (unchanged data) --------------------------------- */
+  function renderNow() {
+    const el = $("#nowStack");
+    if (!el || typeof NOW_STACK === "undefined") return;
+    el.innerHTML = NOW_STACK.map((t, i) => `<li style="--d:${i * 45}ms">${t}</li>`).join("");
+  }
+  function renderProcess() {
+    const el = $("#processFlow");
+    if (!el || typeof PROCESS === "undefined") return;
+    el.innerHTML = PROCESS.map((p, i) => `
+      <div class="process__step reveal" style="--d:${i * 90}ms">
+        <span class="process__num">${p.n}</span>
+        <h4 class="process__title">${p.title}</h4>
+        <p class="process__desc">${p.desc}</p>
+      </div>`).join("");
+  }
+  function renderStack() {
+    const el = $("#stackGrid");
+    if (!el || typeof STACK === "undefined") return;
+    el.innerHTML = STACK.map((s, i) => `
+      <article class="stack-card stack-card--${s.era} reveal" style="--d:${i * 70}ms">
+        <span class="stack-card__tag">${s.tag}</span>
+        <h3 class="stack-card__title">${s.title}</h3>
+        <p class="stack-card__blurb">${s.blurb}</p>
+        <ul class="stack-card__tags">${s.tags.map((t) => `<li>${t}</li>`).join("")}</ul>
+      </article>`).join("");
+  }
+  function catLabel(id) {
+    return (typeof CAT_LABELS !== "undefined" && CAT_LABELS[id]) || id;
+  }
+  function tierOf(p) {
+    return (typeof PROJECT_TIERS !== "undefined" && PROJECT_TIERS[p.name]) || "side";
+  }
+  function renderFilters() {
+    const bar = $("#workFilters");
+    if (!bar || typeof FILTERS === "undefined") return;
+    bar.innerHTML = FILTERS.map((f) => {
+      const on = f.id === "top";
+      return `<button class="chip-filter${on ? " is-active" : ""}" role="tab" data-filter="${f.id}" aria-selected="${on}">${f.label}</button>`;
+    }).join("");
+  }
+  function renderProjects() {
+    const grid = $("#workGrid");
+    if (!grid || typeof PROJECTS === "undefined") return;
+    grid.innerHTML = PROJECTS.map((p, i) => {
+      const tier = tierOf(p);
+      return `
+      <article class="pcard pcard--${p.cat} tier-${tier} reveal${tier === "top" ? "" : " is-hidden"}" data-cat="${p.cat}" data-tier="${tier}" data-groups="${groupsOf(p)}" style="--d:${(i % 6) * 55}ms" tabindex="0">
+        <div class="pcard__glow" aria-hidden="true"></div>
+        <div class="pcard__top"><span class="pcard__cat">${catLabel(p.cat)}</span>${p.metric ? `<span class="pcard__metric">${p.metric}</span>` : ""}</div>
+        ${tier === "top" ? `<span class="pcard__tier">★ top-tier</span>` : ""}
+        ${p.flag ? `<span class="pcard__flag">${p.flag}</span>` : ""}
+        <h3 class="pcard__name">${p.name}</h3>
+        <p class="pcard__blurb">${p.blurb}</p>
+        ${p.highlight ? `<p class="pcard__highlight">▹ ${p.highlight}</p>` : ""}
+        <ul class="pcard__tech">${p.tech.map((t) => `<li>${t}</li>`).join("")}</ul>
+        ${(p.links && p.links.length) ? `<div class="pcard__links">${p.links.map((l) => `<a href="${l.url}" class="pcard__link" target="_blank" rel="noopener">${l.label}<svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>`).join("")}</div>` : ""}
+      </article>`;
+    }).join("");
+  }
+  function groupsOf(p) {
+    if (p.groups && p.groups.length) return p.groups.join(" ");
+    if (p.cat === "web3") return "crypto";
+    if (p.cat === "iot") return "hobby";
+    return "coding";
+  }
+  function matchFilter(f, c) {
+    if (f === "all") return true;
+    if (f === "top") return c.dataset.tier === "top";
+    return (c.dataset.groups || "").split(" ").indexOf(f) !== -1;
+  }
+  function initFilters() {
+    const bar = $("#workFilters"), grid = $("#workGrid");
+    if (!bar || !grid) return;
+    bar.addEventListener("click", (e) => {
+      const btn = e.target.closest(".chip-filter");
+      if (!btn) return;
+      const f = btn.dataset.filter;
+      $$(".chip-filter", bar).forEach((b) => { const on = b === btn; b.classList.toggle("is-active", on); b.setAttribute("aria-selected", on); });
+      $$(".pcard", grid).forEach((c) => {
+        const show = matchFilter(f, c);
+        c.classList.toggle("is-hidden", !show);
+        if (show) c.classList.add("is-visible");
+      });
+    });
+  }
+  function renderTimeline() {
+    const el = $("#timeline");
+    if (!el || typeof TIMELINE === "undefined") return;
+    el.innerHTML = TIMELINE.map((t, i) => `
+      <div class="tl-item tl-item--${t.era} reveal" style="--d:${i * 55}ms">
+        <div class="tl-item__dot" aria-hidden="true"></div>
+        <div class="tl-item__card">
+          <span class="tl-item__period">${t.period}</span>
+          <h3 class="tl-item__role">${t.role}</h3>
+          <span class="tl-item__org">${t.org}</span>
+          <p class="tl-item__desc">${t.desc}</p>
+          <ul class="tl-item__tags">${t.tags.map((x) => `<li>${x}</li>`).join("")}</ul>
+        </div>
+      </div>`).join("");
+  }
+
+  /* ---- reveal + counters ---------------------------------------------- */
+  function initReveal() {
+    const els = $$(".reveal");
+    if (reduce || !("IntersectionObserver" in window)) {
+      els.forEach((e) => e.classList.add("is-visible"));
+      $$(".counter").forEach((c) => (c.textContent = c.dataset.target + (c.dataset.suffix || "")));
+      return;
+    }
+    const io = new IntersectionObserver((ents, obs) => {
+      ents.forEach((en) => {
+        if (en.isIntersecting) {
+          en.target.classList.add("is-visible");
+          if (en.target.classList.contains("counter")) animateCounter(en.target);
+          $$(".counter", en.target).forEach(animateCounter);
+          obs.unobserve(en.target);
+        }
+      });
+    }, { threshold: 0.14, rootMargin: "0px 0px -8% 0px" });
+    els.forEach((e) => io.observe(e));
+    $$(".counter").forEach((c) => io.observe(c));
+  }
+  function animateCounter(el) {
+    if (el.dataset.done) return;
+    el.dataset.done = "1";
+    const target = parseFloat(el.dataset.target), suffix = el.dataset.suffix || "";
+    const start = performance.now(), dur = 1400;
+    (function tick(now) {
+      const t = Math.min((now - start) / dur, 1);
+      el.textContent = Math.round((1 - Math.pow(1 - t, 3)) * target) + (t === 1 ? suffix : "");
+      if (t < 1) requestAnimationFrame(tick);
+    })(start);
+  }
+
+  /* ---- nav ------------------------------------------------------------ */
+  function initNav() {
+    const nav = $("#nav"), progress = $("#scrollProgress"), burger = $("#navBurger"), links = $(".nav__links");
+    function onScroll() {
+      const y = window.scrollY;
+      if (nav) nav.classList.toggle("is-scrolled", y > 24);
+      if (progress) { const h = document.documentElement.scrollHeight - innerHeight; progress.style.transform = `scaleX(${h > 0 ? y / h : 0})`; }
+    }
+    addEventListener("scroll", onScroll, { passive: true }); onScroll();
+    if (burger && links) {
+      burger.addEventListener("click", () => { const o = nav.classList.toggle("menu-open"); burger.setAttribute("aria-expanded", o); });
+      links.addEventListener("click", (e) => { if (e.target.tagName === "A") { nav.classList.remove("menu-open"); burger.setAttribute("aria-expanded", "false"); } });
+    }
+    const sections = $$("main section[id]"), navLinks = $$(".nav__links a");
+    if ("IntersectionObserver" in window && sections.length) {
+      const spy = new IntersectionObserver((ents) => {
+        ents.forEach((en) => { if (en.isIntersecting) navLinks.forEach((a) => a.classList.toggle("is-active", a.getAttribute("href") === "#" + en.target.id)); });
+      }, { rootMargin: "-45% 0px -50% 0px" });
+      sections.forEach((s) => spy.observe(s));
+    }
+  }
+
+  /* ---- hero rotator --------------------------------------------------- */
+  function initRotator() {
+    const el = $("#roleRotator");
+    if (!el) return;
+    const words = ["directed AI swarms.", "TypeScript & Node.js.", "Web3 & Solidity.", "Next.js products.", "…on C++ foundations."];
+    if (reduce) { el.textContent = words[0]; return; }
+    let wi = 0, ci = 0, del = false;
+    (function step() {
+      const w = words[wi];
+      ci += del ? -1 : 1;
+      el.textContent = w.slice(0, ci);
+      let d = del ? 36 : 68;
+      if (!del && ci === w.length) { d = 1500; del = true; }
+      else if (del && ci === 0) { del = false; wi = (wi + 1) % words.length; d = 320; }
+      setTimeout(step, d);
+    })();
+  }
+
+  /* ---- pointer-tracked card glow -------------------------------------- */
+  function initCardFx() {
+    if (reduce) return;
+    document.addEventListener("pointermove", (e) => {
+      const card = e.target.closest(".pcard, .swarm-card, .stack-card");
+      if (!card) return;
+      const r = card.getBoundingClientRect();
+      card.style.setProperty("--mx", `${e.clientX - r.left}px`);
+      card.style.setProperty("--my", `${e.clientY - r.top}px`);
+    });
+  }
+
+  /* ---- smooth scroll -------------------------------------------------- */
+  function initSmoothScroll() {
+    document.addEventListener("click", (e) => {
+      const a = e.target.closest('a[href^="#"]');
+      if (!a) return;
+      const id = a.getAttribute("href");
+      if (id.length < 2) return;
+      const tgt = document.querySelector(id);
+      if (!tgt) return;
+      e.preventDefault();
+      tgt.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+      history.replaceState(null, "", id);
+    });
+  }
+
+  /* ====================================================================
+     FLUID NETWORK — the very first idea: a living, drifting tech network
+     ==================================================================== */
+  function renderFluidNetwork(box) {
+    if (!box || typeof FLUID_NODES === "undefined") return;
+    box.textContent = "";
+    const canvas = document.createElement("canvas");
+    canvas.className = "fluid-canvas";
+    box.appendChild(canvas);
+    const ctx = canvas.getContext("2d");
+    let W, H, dpr, raf, nodes;
+    function size() {
+      dpr = Math.min(devicePixelRatio || 1, 2);
+      const r = box.getBoundingClientRect();
+      W = canvas.width = Math.max(1, Math.floor(r.width * dpr));
+      H = canvas.height = Math.max(1, Math.floor(r.height * dpr));
+      canvas.style.width = r.width + "px"; canvas.style.height = r.height + "px";
+    }
+    function build() {
+      nodes = FLUID_NODES.map((n) => ({
+        c: n.c, label: n.label,
+        x: 50 + Math.random() * (W - 100), y: 40 + Math.random() * (H - 80),
+        vx: (Math.random() - 0.5) * 0.25 * dpr, vy: (Math.random() - 0.5) * 0.25 * dpr,
+        r: 2.6 * dpr,
+      }));
+    }
+    function frame() {
+      ctx.clearRect(0, 0, W, H);
+      const ld = 175 * dpr;
+      for (let i = 0; i < nodes.length; i++) {
+        const n = nodes[i];
+        n.x += n.vx; n.y += n.vy;
+        if (n.x < 40 || n.x > W - 40) n.vx *= -1;
+        if (n.y < 28 || n.y > H - 28) n.vy *= -1;
+        for (let j = i + 1; j < nodes.length; j++) {
+          const m = nodes[j], dx = n.x - m.x, dy = n.y - m.y, d = Math.hypot(dx, dy);
+          if (d < ld) {
+            const a = (1 - d / ld) * 0.3;
+            ctx.strokeStyle = `rgba(${n.c[0]},${n.c[1]},${n.c[2]},${a})`;
+            ctx.lineWidth = 0.7 * dpr;
+            ctx.beginPath(); ctx.moveTo(n.x, n.y); ctx.lineTo(m.x, m.y); ctx.stroke();
+            if (d < ld * 0.72) {
+              const t = (performance.now() % 2200) / 2200;
+              ctx.fillStyle = `rgba(255,255,255,${a * 1.8})`;
+              ctx.beginPath(); ctx.arc(n.x + (m.x - n.x) * t, n.y + (m.y - n.y) * t, 1.3 * dpr, 0, 7); ctx.fill();
+            }
+          }
+        }
+        ctx.fillStyle = `rgba(${n.c[0]},${n.c[1]},${n.c[2]},0.92)`;
+        ctx.beginPath(); ctx.arc(n.x, n.y, n.r, 0, 7); ctx.fill();
+        ctx.font = `600 ${12 * dpr}px "Space Grotesk", system-ui, sans-serif`;
+        ctx.textAlign = "center"; ctx.textBaseline = "middle";
+        ctx.shadowColor = "rgba(0,0,0,0.65)"; ctx.shadowBlur = 4 * dpr;
+        ctx.fillStyle = "rgba(232,235,246,0.93)";
+        ctx.fillText(n.label, n.x, n.y - n.r - 9 * dpr);
+        ctx.shadowBlur = 0;
+      }
+      raf = requestAnimationFrame(frame);
+    }
+    function start() { cancelAnimationFrame(raf); size(); build(); frame(); if (reduce) cancelAnimationFrame(raf); }
+    let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(start, 200); });
+    document.addEventListener("visibilitychange", () => { if (document.hidden) cancelAnimationFrame(raf); else if (!reduce) frame(); });
+    start();
+  }
+
+  /* ====================================================================
+     WORD CLOUD — d3-cloud over the whole-CV keyword set (graceful fallback)
+     ==================================================================== */
+  function renderWordCloud() {
+    const stage = $("#wcStage");
+    if (!stage || typeof WORDCLOUD === "undefined") return;
+    const legend = $("#wcLegend"), tip = $("#wcTip");
+    const cats = WORDCLOUD.cats, ws = WORDCLOUD.words;
+    const catColor = (id) => { const c = cats.find((x) => x.id === id); return c ? c.color : "#aab1c8"; };
+    if (legend) legend.innerHTML = cats.map((c) => `<span><i style="background:${c.color}"></i>${c.label}</span>`).join("");
+
+    // fallback: no d3 → render weighted chips
+    if (!window.d3 || !d3.layout || !d3.layout.cloud) {
+      const max = Math.max.apply(null, ws.map((w) => w.weight));
+      stage.innerHTML = '<div class="wc-fallback">' + ws.slice().sort((a, b) => b.weight - a.weight).map((w) =>
+        `<span style="color:${catColor(w.cat)};font-size:${12 + (w.weight / max) * 26}px;font-weight:${w.weight > max * 0.6 ? 700 : 500}">${w.text}</span>`).join("") + '</div>';
+      return;
+    }
+
+    const ext = d3.extent(ws, (d) => d.weight);
+    const sizeScale = d3.scaleSqrt().domain(ext).range([12, 44]);
+    const opOf = (d) => (d.size > 34 ? 0.9 : d.size > 22 ? 0.66 : 0.46); // dim, not glowing
+    let layout;
+    function build() {
+      const W = stage.clientWidth, H = stage.clientHeight;
+      if (W < 10 || H < 10) return;
+      if (layout) { try { layout.stop(); } catch (e) { } }
+      d3.select(stage).selectAll("svg").remove();
+      const svg = d3.select(stage).append("svg").attr("width", "100%").attr("height", "100%").attr("viewBox", [0, 0, W, H]);
+      const g = svg.append("g").attr("transform", `translate(${W / 2},${H / 2})`);
+      const words = ws.map((d) => ({ text: d.text, cat: d.cat, weight: d.weight, size: sizeScale(d.weight) }));
+      layout = d3.layout.cloud().size([W, H]).words(words).padding(2.4).font("Space Grotesk")
+        .fontSize((d) => d.size).rotate((d, i) => (i % 6 === 0 ? 90 : 0)).on("end", draw).start();
+      function draw(placed) {
+        const sel = g.selectAll("text").data(placed).join("text")
+          .attr("text-anchor", "middle").attr("dominant-baseline", "middle")
+          .attr("font-family", "Space Grotesk, sans-serif")
+          .attr("font-weight", (d) => (d.size > 34 ? "600" : "500"))
+          .attr("font-size", (d) => d.size + "px")
+          .attr("fill", (d) => catColor(d.cat))
+          .attr("transform", (d) => `translate(${d.x},${d.y}) rotate(${d.rotate})`)
+          .style("cursor", "default").style("user-select", "none")
+          .text((d) => d.text);
+        if (!reduce) sel.attr("opacity", 0).transition().delay((d, i) => i * 7).duration(340).attr("opacity", opOf);
+        else sel.attr("opacity", opOf);
+        sel.on("mouseenter", function (e, d) {
+          d3.select(this).raise().attr("opacity", 1);
+          g.selectAll("text").filter((n) => n.cat !== d.cat).attr("opacity", 0.1);
+          if (tip) { const c = cats.find((x) => x.id === d.cat); tip.innerHTML = "<b>" + d.text + "</b><br>" + (c ? c.label : ""); tip.classList.add("is-on"); }
+        }).on("mousemove", function (e) { if (tip) { tip.style.left = e.clientX + "px"; tip.style.top = e.clientY + "px"; } })
+          .on("mouseleave", function () { g.selectAll("text").attr("opacity", opOf); if (tip) tip.classList.remove("is-on"); });
+      }
+    }
+    build();
+    if ("ResizeObserver" in window) {
+      const ro = new ResizeObserver(() => { clearTimeout(stage._t); stage._t = setTimeout(build, 250); });
+      ro.observe(stage);
+    }
+  }
+
+  /* ---- boot ----------------------------------------------------------- */
+  function boot() {
+    // the single product diagram
+    if (typeof MAP_PRODUCT !== "undefined") renderMap($("#mapProduct"), MAP_PRODUCT);
+    renderWordCloud();
+    renderWorkshift();
+    renderNow(); renderProcess(); renderStack();
+    renderFilters(); renderProjects(); renderTimeline();
+    initFilters(); initReveal(); initNav(); initRotator(); initCardFx(); initSmoothScroll();
+    const y = $("#year"); if (y) y.textContent = new Date().getFullYear();
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
+  else boot();
+})();
