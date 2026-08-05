@@ -1,0 +1,127 @@
+/* =========================================================================
+   CV sheet - print-first stylesheet for cv.html.
+   Tokens mirror styles.css (ink #191b1f, accent #244297, IBM Plex);
+   the sheet prints black on white, the warm paper tone is screen-only.
+   ========================================================================= */
+:root {
+  --cv-ink: #191b1f;
+  --cv-accent: #244297;
+  --cv-mute: #61666f;
+  --cv-line: #d5d1c8;
+  --font-sans: "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+
+@page { size: A4; margin: 13mm 14mm; }
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 9pt;
+  line-height: 1.4;
+  color: var(--cv-ink);
+}
+
+/* ---- head ------------------------------------------------------------- */
+.cv-head { border-bottom: 2px solid var(--cv-accent); padding-bottom: 2.5mm; }
+.cv-head h1 { margin: 0; font-size: 20pt; font-weight: 700; letter-spacing: -0.01em; }
+.cv-title { margin: 0.6mm 0 0; font-size: 11pt; font-weight: 600; color: var(--cv-accent); }
+.cv-tagline { margin: 0.8mm 0 0; font-family: var(--font-mono); font-size: 8pt; color: var(--cv-mute); }
+.cv-contact { margin: 1.6mm 0 0; font-size: 8.2pt; }
+.cv-contact a { color: var(--cv-ink); text-decoration: none; }
+
+/* ---- sections --------------------------------------------------------- */
+section { margin-top: 3.6mm; }
+h2 {
+  margin: 0 0 1.6mm;
+  padding-bottom: 0.8mm;
+  font-size: 9pt;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--cv-accent);
+  border-bottom: 1px solid var(--cv-line);
+}
+p { margin: 0; }
+
+/* ---- entries (employment, projects, education) ------------------------ */
+.cv-entry { margin-bottom: 2.4mm; break-inside: avoid; }
+.cv-entry:last-child { margin-bottom: 0; }
+.cv-entry__head { display: flex; align-items: baseline; gap: 2.5mm; }
+.cv-entry h3 { margin: 0; font-size: 9.4pt; font-weight: 600; }
+.cv-period {
+  flex: 0 0 24mm;
+  font-family: var(--font-mono);
+  font-size: 7.8pt;
+  color: var(--cv-mute);
+}
+.cv-org { font-size: 8.6pt; font-weight: 500; color: var(--cv-mute); }
+.cv-metric {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 7.8pt;
+  font-weight: 500;
+  color: var(--cv-accent);
+  white-space: nowrap;
+}
+.cv-entry p { margin-top: 0.5mm; }
+.cv-entry--indent p,
+.cv-entry--indent .cv-tech { margin-left: 26.5mm; }
+.cv-tech { margin-top: 0.5mm; font-family: var(--font-mono); font-size: 7.6pt; color: var(--cv-mute); }
+
+/* ---- label rows (skills, open source) --------------------------------- */
+.cv-skillrow,
+.cv-ossrow {
+  display: grid;
+  grid-template-columns: 34mm 1fr;
+  gap: 2.5mm;
+  margin-bottom: 1.4mm;
+  break-inside: avoid;
+}
+.cv-ossrow { grid-template-columns: 51mm 1fr; }
+.cv-skillrow:last-child,
+.cv-ossrow:last-child { margin-bottom: 0; }
+.cv-label {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-family: var(--font-mono);
+  font-size: 7.8pt;
+  color: var(--cv-accent);
+}
+.cv-ossrow .cv-label { font-size: 7.4pt; }
+
+/* ---- two-column tail block -------------------------------------------- */
+.cv-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0 7mm; align-items: start; }
+.cv-cols > * > section:first-child { margin-top: 3.6mm; }
+
+/* ---- footer ----------------------------------------------------------- */
+.cv-foot {
+  margin-top: 4mm;
+  padding-top: 1.6mm;
+  border-top: 1px solid var(--cv-line);
+  font-family: var(--font-mono);
+  font-size: 7.4pt;
+  color: var(--cv-mute);
+}
+
+/* ---- page budget ------------------------------------------------------ */
+.cv-page2 { break-before: page; margin-top: 0; }
+
+/* ---- screen = preview of the printed sheet ---------------------------- */
+@media screen {
+  body { background: #d8d5cd; padding: 1px 0; }
+  .cv {
+    width: 210mm;
+    margin: 6mm auto;
+    padding: 13mm 14mm;
+    background: #fff;
+    box-shadow: 0 2px 24px rgba(25, 27, 31, 0.25);
+  }
+  .cv-page2 { border-top: 1px dashed var(--cv-line); padding-top: 6mm; margin-top: 6mm; }
+}
+
+@media print {
+  .cv { width: auto; margin: 0; padding: 0; background: none; box-shadow: none; }
+}

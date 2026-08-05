@@ -1,133 +1,15 @@
 /* =========================================================================
-   Portfolio v2 — data layer
-   Tech-skill network graph + content. Emphasis on the CURRENT stack
-   (AI swarms · TypeScript · Web3 · Next.js) with C++/SQL as the foundation.
+   Portfolio - data layer
+   All page content: the product diagram, projects, open-source repos, stack,
+   word cloud, process and timeline.
    ========================================================================= */
 
-/* ---- SYSTEM MAP (grouped) ----------------------------------------------
-   The story: I (the architect) sit on top. There are TWO different AIs:
-
-     1. AI coding swarm  — the agents I DIRECT to build & maintain everything
-                           (Claude Code, MCP, agent swarm, parallel agents).
-     2. Runtime AI       — the AI the PRODUCTS themselves use at run-time
-                           (LLM API, vector / RAG).
-
-   Nodes are grouped into boxes (TECHMAP_GROUPS). Relationships between whole
-   groups are TECHMAP_GROUP_LINKS; node-level edges (TECHMAP_EDGES) are the
-   flows INSIDE each group.
-
-   Edge/packet kinds:  flow (cyan/pink) · control (gold, I direct) · assist
-   (violet, the coding swarm builds it).
-   ----------------------------------------------------------------------- */
-const TECHMAP_NODES = [
-  // The human + the end user — standalone, no group box
-  { id: "you",       role: "You · architect",  icon: "glyph:architect", x: 7, y: 9,  tier: "human", big: true, hero: true },
-  { id: "client",    role: "Client",           icon: "glyph:user",      x: 5, y: 63, tier: "edge" },
-
-  // GROUP 1 — AI coding swarm (I direct it; it builds the products)
-  { id: "orch",      role: "Claude Code",      icon: "claude",      x: 38, y: 17, tier: "ai", group: "swarm" },
-  { id: "mcp",       role: "MCP tools",        icon: "glyph:mcp",   x: 29, y: 26, tier: "ai", group: "swarm" },
-  { id: "swarm",     role: "Agent swarm",      icon: "glyph:swarm", x: 52, y: 16, tier: "ai", group: "swarm", big: true },
-  { id: "agents",    role: "Parallel agents",  icon: "glyph:orch",  x: 62, y: 25, tier: "ai", group: "swarm" },
-
-  // GROUP 2 — Products · the running system
-  { id: "frontend",  role: "Web frontend",     icon: "next",  sub: ["react"],        x: 16, y: 55, tier: "web",   group: "products", big: true },
-  { id: "api",       role: "API server",       icon: "node",  sub: ["ts", "express"], x: 30, y: 58, tier: "api",   group: "products", big: true, hub: true },
-  { id: "backend",   role: "Backend & workers",icon: "glyph:server", sub: ["ts"], x: 44, y: 60, tier: "core",  group: "products" },
-  { id: "engine",    role: "High-perf engine", icon: "cpp",         x: 57, y: 54, tier: "core",  group: "products" },
-  { id: "tools",     role: "Tools · CLI",      icon: "glyph:tools",  x: 18, y: 71, tier: "infra", group: "products" },
-  { id: "db",        role: "Databases",        icon: "mongo", sub: ["pg"], x: 32, y: 75, tier: "data",  group: "products" },
-  { id: "contracts", role: "Smart contracts",  icon: "solidity",    x: 47, y: 77, tier: "web3",  group: "products" },
-  { id: "chain",     role: "EVM chains",       icon: "web3",        x: 60, y: 80, tier: "web3",  group: "products" },
-  { id: "infra",     role: "Infra · Docker",   icon: "docker",      x: 18, y: 86, tier: "infra", group: "products" },
-
-  // GROUP 3 — Runtime AI (the AI the products use at run-time)
-  { id: "llm",       role: "LLM API",          icon: "glyph:llm",    x: 80, y: 52, tier: "ai", group: "runtimeai" },
-  { id: "vector",    role: "Vector · RAG",     icon: "glyph:vector", x: 87, y: 66, tier: "ai", group: "runtimeai" },
-];
-
-/* node-level flows INSIDE the groups (+ the client hitting the products) */
-const TECHMAP_EDGES = [
-  // running system — request in, response back
-  { from: "client",    to: "frontend",  ret: true },
-  { from: "frontend",  to: "api",       ret: true },
-  { from: "api",       to: "backend",   ret: true },
-  { from: "api",       to: "contracts", ret: true },
-  { from: "contracts", to: "chain",     ret: true },
-  { from: "backend",   to: "engine",    ret: true },
-  { from: "backend",   to: "db",        ret: true },
-  { from: "tools",     to: "infra" },
-  { from: "infra",     to: "api" },
-  { from: "infra",     to: "backend" },
-  // inside the AI coding swarm
-  { from: "orch",      to: "mcp" },
-  { from: "orch",      to: "swarm" },
-  { from: "mcp",       to: "swarm" },
-  { from: "swarm",     to: "agents",    ret: true },
-  // inside runtime AI
-  { from: "llm",       to: "vector",    ret: true },
-];
-
-/* the group boxes */
-const TECHMAP_GROUPS = [
-  { id: "swarm",     label: "AI coding swarm — I direct it",     accent: "167,139,250" },
-  { id: "products",  label: "Products — the running system",     accent: "34,211,238" },
-  { id: "runtimeai", label: "Runtime AI — used by the products", accent: "244,114,182" },
-];
-
-/* relationships between whole groups (and from the You node).
-   anchor "g:<id>" = a group box; otherwise a node id. */
-const TECHMAP_GROUP_LINKS = [
-  { from: "you",        to: "g:swarm",     kind: "control" }, // I direct the coding swarm
-  { from: "you",        to: "g:products",  kind: "control" }, // I architect the products
-  { from: "g:swarm",    to: "g:products",  kind: "assist" },  // the swarm builds the products
-  { from: "g:swarm",    to: "g:runtimeai", kind: "assist" },  // …and builds their runtime AI
-  { from: "g:products", to: "g:runtimeai", kind: "flow", ret: true }, // products call runtime AI
-];
-
-/* =========================================================================
-   CHART GALLERY — several variants, kept side by side to iterate on.
-   MAP_V3 reuses the grouped data above; the others are self-contained.
-   ========================================================================= */
-const MAP_V3 = {
-  nodes: TECHMAP_NODES, edges: TECHMAP_EDGES, groups: TECHMAP_GROUPS, groupLinks: TECHMAP_GROUP_LINKS,
-  hint: "two AIs: a <b>coding swarm I direct</b> builds the products &middot; the products use their own <b>runtime AI</b>",
-};
-
-/* --- v2 — a request flowing through the system (no You, no groups) --- */
-const MAP_V2 = {
-  groups: [], groupLinks: [],
-  hint: "v2 — a request flowing through the running system",
-  nodes: [
-    { id: "client",    role: "Client",           icon: "glyph:user",  x: 6,  y: 50, tier: "edge" },
-    { id: "frontend",  role: "Web frontend",     icon: "next",  sub: ["react"],        x: 22, y: 50, tier: "web", big: true },
-    { id: "api",       role: "API server",       icon: "node",  sub: ["ts", "express"], x: 40, y: 50, tier: "api", big: true, hub: true },
-    { id: "ai",        role: "AI orchestrator",  icon: "claude", sub: ["python"],       x: 60, y: 16, tier: "ai" },
-    { id: "engine",    role: "High-perf engine", icon: "cpp",         x: 58, y: 38, tier: "core" },
-    { id: "contracts", role: "Smart contracts",  icon: "solidity",    x: 60, y: 63, tier: "web3" },
-    { id: "db",        role: "Databases",        icon: "mongo", sub: ["pg"], x: 61, y: 85, tier: "data" },
-    { id: "mcp",       role: "MCP tools",        icon: "glyph:mcp",   x: 80, y: 9,  tier: "ai" },
-    { id: "swarm",     role: "Agent swarm",      icon: "glyph:swarm", x: 90, y: 25, tier: "ai", hero: true, big: true },
-    { id: "agents",    role: "Parallel agents",  icon: "glyph:orch",  x: 90, y: 44, tier: "ai" },
-    { id: "chain",     role: "EVM chains",       icon: "web3",        x: 80, y: 71, tier: "web3" },
-    { id: "infra",     role: "Infra · Docker",   icon: "docker",      x: 40, y: 88, tier: "infra" },
-  ],
-  edges: [
-    { from: "client", to: "frontend", ret: true }, { from: "frontend", to: "api", ret: true },
-    { from: "api", to: "ai", ret: true }, { from: "api", to: "engine", ret: true },
-    { from: "api", to: "contracts", ret: true }, { from: "api", to: "db", ret: true },
-    { from: "ai", to: "mcp" }, { from: "ai", to: "swarm" }, { from: "mcp", to: "swarm" },
-    { from: "swarm", to: "agents", ret: true }, { from: "contracts", to: "chain", ret: true },
-    { from: "infra", to: "api" }, { from: "infra", to: "db" },
-  ],
-};
-
-/* --- product-focused, LAYERED — client (left) · what we built (centre) ·
+/* --- product-focused, LAYERED: client (left) · what we built (centre) ·
        AI services (top-right) · external infra & services (bottom-right).
-       Docker isn't a node — it wraps everything (badge top-right). --- */
+       Docker isn't a node - it wraps everything (badge top-right). --- */
 const MAP_PRODUCT = {
   groups: [
-    { id: "built",    label: "Built by us — our code",        accent: "34,211,238" },
+    { id: "built",    label: "Built by us · our code",        accent: "34,211,238" },
     { id: "ai",       label: "AI services",                   accent: "244,114,182" },
     { id: "external", label: "External infra & services",     accent: "148,163,184" },
   ],
@@ -138,30 +20,31 @@ const MAP_PRODUCT = {
   hint: "client &rarr; what <b>we built</b> &rarr; external services + AI",
   nodes: [
     { id: "client",    role: "Client",           icon: "glyph:user",   x: 5,  y: 47, tier: "edge", big: true },
-    // BUILT BY US — interfaces (left col) + our logic (right col)
-    // symmetric 3×2 grid — API server centred on top, mirrored left/right
+    // BUILT BY US - interfaces (left col) + our logic (right col)
+    // top row: frontend · api · contracts; bottom row: engine · backend;
+    // cli sits mid-left so its lines to engine and backend clear the chips
     { id: "frontend",  role: "Web frontend",     icon: "next",  sub: ["react"],        x: 16, y: 35, tier: "web",  group: "built", big: true },
     { id: "api",       role: "API server",       icon: "node",  sub: ["ts", "express"], x: 36, y: 35, tier: "api",  group: "built", big: true, hub: true },
-    { id: "engine",    role: "High-perf engine", icon: "cpp",          x: 56, y: 35, tier: "core",  group: "built" },
-    { id: "cli",       role: "CLI · tools",      icon: "glyph:tools",  x: 16, y: 63, tier: "infra", group: "built" },
-    { id: "backend",   role: "Backend & workers",icon: "glyph:server", sub: ["ts"], x: 36, y: 63, tier: "core",  group: "built" },
-    { id: "contracts", role: "Smart contracts",  icon: "solidity",     x: 56, y: 63, tier: "web3",  group: "built" },
-    // AI SERVICES — top-right
+    { id: "contracts", role: "Smart contracts",  icon: "solidity",     x: 56, y: 35, tier: "web3",  group: "built" },
+    { id: "cli",       role: "CLI · tools",      icon: "glyph:tools",  x: 16, y: 50, tier: "infra", group: "built" },
+    { id: "engine",    role: "High-perf engine", icon: "cpp",          x: 36, y: 63, tier: "core",  group: "built" },
+    { id: "backend",   role: "Backend & workers",icon: "glyph:server", sub: ["ts"], x: 56, y: 63, tier: "core",  group: "built" },
+    // AI SERVICES - top-right
     { id: "llm",       role: "LLM / AI",         icon: "glyph:llm",    x: 70, y: 16, tier: "ai", group: "ai", big: true },
     { id: "vector",    role: "Vector · RAG",     icon: "glyph:vector", x: 88, y: 16, tier: "ai", group: "ai" },
     { id: "agents",    role: "AI agents",        icon: "glyph:swarm",  x: 79, y: 28, tier: "ai", group: "ai" },
-    // EXTERNAL INFRA & SERVICES — bottom-right (things we use, not built)
-    { id: "db",        role: "Databases",        icon: "mongo", sub: ["pg"], x: 70, y: 54, tier: "data",  group: "external" },
+    // EXTERNAL INFRA & SERVICES - bottom-right (things we use, not built)
+    { id: "db",        role: "Databases",        icon: "mongo", sub: ["pg"], x: 79, y: 82, tier: "data",  group: "external" },
     { id: "queue",     role: "Event queue",      icon: "glyph:queue",  x: 88, y: 54, tier: "infra", group: "external" },
     { id: "mqtt",      role: "MQTT broker",      icon: "glyph:mqtt",   x: 70, y: 69, tier: "infra", group: "external" },
     { id: "storage",   role: "Object storage",   icon: "glyph:storage",x: 88, y: 69, tier: "infra", group: "external" },
-    { id: "chain",     role: "EVM chains",       icon: "web3",         x: 79, y: 82, tier: "web3",  group: "external" },
+    { id: "chain",     role: "EVM chains",       icon: "web3",         x: 70, y: 54, tier: "web3",  group: "external" },
   ],
   edges: [
     // the client talks only to the left-hand interfaces: web + CLI
     { from: "client", to: "frontend", ret: true },
     { from: "client", to: "cli",      ret: true },
-    // inside "built" — the request path
+    // inside "built" - the request path
     { from: "frontend", to: "api",      ret: true },
     { from: "api",      to: "backend",  ret: true },
     { from: "api",      to: "engine",   ret: true },   // API also calls the high-perf engine
@@ -182,13 +65,13 @@ const MAP_PRODUCT = {
 };
 
 /* =========================================================================
-   WORD CLOUD — everything in my toolbox, pulled from the whole CV + projects.
+   WORD CLOUD - everything in my toolbox, pulled from the whole CV + projects.
    [text, weight] grouped by category; assembled into WORDCLOUD.words below.
    ========================================================================= */
 const WC_CATS = [
-  { id: "ai",      label: "AI & LLM",        color: "#f472b6" },
   { id: "web3",    label: "Web3 & DeFi",     color: "#a78bfa" },
   { id: "backend", label: "Backend",         color: "#22d3ee" },
+  { id: "ai",      label: "AI & LLM",        color: "#f472b6" },
   { id: "web",     label: "Web & Frontend",  color: "#60a5fa" },
   { id: "data",    label: "Databases",       color: "#34d399" },
   { id: "infra",   label: "DevOps & Cloud",  color: "#94a3b8" },
@@ -203,7 +86,8 @@ const WC_RAW = {
     ["Adversarial verification", 5], ["RAG", 5], ["Whisper", 6], ["Parakeet", 3], ["Ollama", 5],
     ["onnx-asr", 3], ["Tesseract OCR", 4], ["Prompt engineering", 5], ["DirectML", 3], ["CUDA", 3],
     ["Voice-to-text", 5], ["Image generation", 4], ["Figma-to-React", 4], ["Electron", 6],
-    ["xterm.js", 3], ["node-pty", 3], ["Agent SDK", 7],
+    ["xterm.js", 3], ["node-pty", 3], ["Agent SDK", 7], ["Jamat", 8], ["ScreenMCP", 5],
+    ["Codex", 5], ["Open source", 6],
   ],
   web3: [
     ["Solidity", 9], ["Web3", 9], ["EVM", 8], ["Ethereum", 8], ["Hardhat", 8], ["OpenZeppelin", 7],
@@ -211,7 +95,7 @@ const WC_RAW = {
     ["Solana", 7], ["Cosmos", 6], ["CosmJS", 5], ["Injective", 4], ["Launchpad", 7], ["IDO / presale", 6],
     ["Vesting", 5], ["Airdrops", 6], ["Sniping bots", 6], ["Smart Order Router", 5], ["KYC", 4],
     ["Gnosis Safe", 4], ["PRBMath", 4], ["zkSync", 4], ["Arbitrum", 5], ["BSC", 4], ["AngelsSquad", 6],
-    ["$10M+ raised", 6], ["CCXT", 6],
+    ["CCXT", 6], ["SecretKeeper", 6],
   ],
   backend: [
     ["Node.js", 10], ["TypeScript", 10], ["Express", 8], ["REST APIs", 8], ["WebSockets", 7],
@@ -246,7 +130,7 @@ const WC_RAW = {
     ["Clean code", 5], ["Code review", 5], ["Refactoring", 4], ["Async", 5], ["Caching", 5],
     ["Technical leadership", 6], ["Due diligence", 4], ["Mentoring", 3], ["Remote-first", 5],
     ["Skipper", 7], ["Moonhill Capital", 7], ["Inventic", 6], ["Atomix framework", 6], ["CryptoTracker", 5],
-    ["CoinScorer", 5], ["CTO", 6], ["25 years shipping", 6], ["$1M+ revenue", 5], ["Self-taught", 4],
+    ["CoinScorer", 5], ["CTO", 6], ["Self-taught", 4],
   ],
 };
 
@@ -257,18 +141,6 @@ const WORDCLOUD = {
     return acc;
   }, []),
 };
-
-/* --- the very first idea — a living, drifting tech network --- */
-const FLUID_NODES = [
-  { label: "C++", c: [148, 163, 184] }, { label: "Qt", c: [148, 163, 184] },
-  { label: "TypeScript", c: [34, 211, 238] }, { label: "Node.js", c: [34, 211, 238] },
-  { label: "Next.js", c: [96, 165, 250] }, { label: "React", c: [96, 165, 250] },
-  { label: "Solidity", c: [167, 139, 250] }, { label: "Web3", c: [167, 139, 250] },
-  { label: "Docker", c: [148, 163, 184] }, { label: "MongoDB", c: [52, 211, 153] },
-  { label: "Postgres", c: [52, 211, 153] }, { label: "Python", c: [34, 211, 238] },
-  { label: "Claude", c: [244, 114, 182] }, { label: "MCP", c: [244, 114, 182] },
-  { label: "AI swarm", c: [244, 114, 182] }, { label: "Whisper", c: [244, 114, 182] },
-];
 
 /* drawn glyphs for concepts without a brand logo (monochrome, currentColor) */
 const ICON_GLYPHS = {
@@ -286,70 +158,35 @@ const ICON_GLYPHS = {
   storage: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><ellipse cx="12" cy="6" rx="7" ry="2.6"/><path d="M5 6v12c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6V6"/><path d="M5 12c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6"/></svg>',
 };
 
-/* ---- AI swarm — agent roles for the swarm schematic ------------------- */
-const SWARM_AGENTS = [
-  "Planner", "Researcher", "Reviewer", "Debugger", "Builder", "Verifier", "Synthesizer",
-];
-
-/* ---- How AI changed the shape of my day (from my own LinkedIn note) ---- */
 const WORKSHIFT = [
-  { pct: 10,  label: "writing code by hand",   note: "the agents type most of it now" },
-  { pct: 90,  label: "reviewing & directing",  note: "reading, steering, catching mistakes early" },
+  { pct: 50, label: "architecture, plans & task briefs", note: "designing the system, writing the plan, briefing the agents" },
+  { pct: 20, label: "writing code by hand",              note: "the swarm I built types the rest" },
+  { pct: 30, label: "reviewing agent output",            note: "every diff gets read before it ships" },
 ];
 
 /* ---- How a feature actually gets built (the loop I run) --------------- */
 const PROCESS = [
-  { n: "01", title: "Architect & plan", desc: "I design the system and write a precise, peer-reviewed plan. No code gets written until the plan is right." },
-  { n: "02", title: "Brief & dispatch", desc: "I split the work and hand well-specified slices to parallel agents, briefed like a sharp mid-level team that never gets lazy." },
-  { n: "03", title: "Review & verify", desc: "Agents adversarially check each other; I read and sign off every line. Nothing ships on AI's judgement alone." },
-  { n: "04", title: "Ship & own", desc: "Architecture to deploy, CI to monitoring. One person, full ownership of the outcome — same bar, far faster." },
-];
-
-/* ---- "Now" focus chips (current emphasis) ----------------------------- */
-const NOW_STACK = [
-  "Directing AI swarms", "TypeScript", "Node.js", "Next.js", "Solidity",
-  "Web3 / EVM", "MCP servers", "Claude Code", "Docker", "MongoDB",
-];
-
-/* ---- How I work with AI (human-in-control) ---------------------------- */
-const SWARM_POINTS = [
-  {
-    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4v16h16"/><path d="M4 20 20 4"/><path d="M4 13h5M4 9h3"/></svg>',
-    title: "I architect — agents execute",
-    desc: "Every system design, data model and hard trade-off is mine; the swarm only executes the well-specified parts I hand it. A powerful helper but a poor master — brilliant on a short leash, dangerous off it — so nothing it writes reaches production without passing my review first.",
-  },
-  {
-    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="8" r="3"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><circle cx="17.5" cy="9" r="2.2"/><path d="M16.5 14.4a4.4 4.4 0 0 1 4.5 4.6"/></svg>',
-    title: "Directed like a team",
-    desc: "An agent is like a mid-level dev who follows every instruction, every time, and never gets lazy — if you brief it well. Precise specs, clear boundaries, tight feedback. Managed well they're remarkably effective; left to decide alone, they drift.",
-  },
-  {
-    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4.2"/></svg>',
-    title: "Verify, then trust",
-    desc: "I don't take one model's word for anything. Agents adversarially check each other, and I hold the final sign-off — so the speed never comes at the cost of correctness.",
-  },
-  {
-    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg>',
-    title: "Faster delivery — oversight matters more",
-    desc: "The swarm compresses the grunt work — boilerplate, research, refactors, test scaffolding — so the same standard ships far faster. But code that's quick to write is just as quick to rot: with AI a bad architectural call gets baked in before you'd catch it by hand. So oversight and sound architecture matter more than ever — exactly where decades of experience pay off.",
-  },
+  { n: "01", title: "Architect & plan", desc: "I design the system and write the plan. No code until the plan is right." },
+  { n: "02", title: "Brief & dispatch", desc: "I split the work into well-specified tasks and hand them to parallel agents." },
+  { n: "03", title: "Review & verify", desc: "Agents cross-check each other's output; I read the result and sign off." },
+  { n: "04", title: "Ship & own", desc: "I deploy, wire up CI and monitoring, and own the outcome in production." },
 ];
 
 /* ---- Stack, grouped by era (current first) ---------------------------- */
 const STACK = [
   {
-    era: "now",
-    tag: "Frontier · my force-multiplier",
-    title: "AI-leveraged engineering",
-    blurb: "I direct multi-agent swarms to amplify my output — staying the architect, the decision-maker and the reviewer. AI does the heavy lifting; the judgement stays human.",
-    tags: ["Claude Agent SDK", "MCP servers", "Multi-agent orchestration", "Human-in-the-loop", "Adversarial verification", "Local ASR · Whisper", "Python"],
-  },
-  {
     era: "core",
     tag: "Core · my daily driver",
-    title: "TypeScript, Web3 & the modern web",
-    blurb: "The stack I ship on every day — backends, smart contracts, bots and Next.js products.",
+    title: "Full-stack TypeScript & Solidity, Web2 & Web3",
+    blurb: "The stack I ship on every day: backends, smart contracts, bots and Next.js products.",
     tags: ["TypeScript", "Node.js", "Next.js", "React 19", "Solidity", "Wagmi / Viem", "MongoDB", "PostgreSQL", "Express", "MUI"],
+  },
+  {
+    era: "now",
+    tag: "Force multiplier · tooling I built",
+    title: "AI-assisted delivery, on my own toolchain",
+    blurb: "I built my own multi-agent tooling (Jamat, ScreenMCP, custom Claude Code agents). It does the heavy typing; the architecture and the decision to ship stay with me.",
+    tags: ["Claude Agent SDK", "MCP servers", "Multi-agent orchestration", "Human-in-the-loop", "Adversarial verification", "Local ASR · Whisper", "Python"],
   },
   {
     era: "infra",
@@ -362,7 +199,7 @@ const STACK = [
     era: "foundation",
     tag: "Foundation · where I come from",
     title: "C++ systems engineering",
-    blurb: "25 years of low-level, high-performance native software. The reason everything above is built right.",
+    blurb: "25 years of low-level, high-performance native software. This is where my habits around performance and correctness come from.",
     tags: ["C++ 11–20", "Qt", "Boost", "Multithreading", "High-performance", "DLL injection / API hooking", "MySQL"],
   },
 ];
@@ -371,6 +208,7 @@ const STACK = [
 const FILTERS = [
   { id: "all",    label: "All" },
   { id: "top",    label: "★ Top-tier" },
+  { id: "ai",     label: "AI & agents" },
   { id: "crypto", label: "Crypto & Web3" },
   { id: "coding", label: "Coding & tooling" },
   { id: "hobby",  label: "Hobby" },
@@ -378,8 +216,8 @@ const FILTERS = [
 
 /* category → badge label shown on each card */
 const CAT_LABELS = {
-  ai: "AI & Swarms", web3: "Web3 & DeFi", backend: "Backend & Bots",
-  web: "Web & Frontend", desktop: "C++ Foundation", iot: "Home & IoT",
+  ai: "AI & agents", web3: "Web3 & DeFi", backend: "Backend & Bots",
+  web: "Web & Frontend", desktop: "C++ Foundation", iot: "Home & IoT", tools: "Dev tooling",
   company: "Company & team",
 };
 
@@ -392,10 +230,12 @@ const PROJECT_TIERS = {
   "Skipper": "top",
   "CryptoTracker": "top",
   "Inventic s.r.o.": "top",
+  "Jamat": "top",
+  "Moonhill Crypto Operations": "top",
+  "SecretKeeper": "top",
   "Local Voice-to-Text": "hobby",
-  "VS Code Source-Control Extensions": "hobby",
-  "Content & Marketing AI": "hobby",
   "Home & IoT automation": "hobby",
+  "CoinScorer": "hobby",
 };
 
 /* ---- Projects (top-tier first) ---------------------------------------- */
@@ -403,12 +243,14 @@ const PROJECTS = [
   {
     name: "DEUSS / IDA",
     cat: "web3",
+    groups: ["crypto", "ai"],
     flag: "ČVUT · reference project",
     metric: "Market surveillance",
     blurb:
-      "IDA (Internal Diligence Agent) — a real-time market-surveillance & compliance platform for DEUSS, a blockchain bond-trading marketplace. A plugin-based, config-driven event pipeline ingests on-chain bond-contract events and external feeds; AI detection agents flag market abuse — wash trading, spoofing, position concentration, spoof/cancel bursts. Built with ČVUT, MAMA AI and VŠE.",
+      "IDA (Internal Diligence Agent): a real-time market-surveillance & compliance platform for DEUSS, a blockchain bond-trading marketplace. A plugin-based, config-driven event pipeline ingests on-chain bond-contract events and external feeds; AI detection agents flag market abuse such as wash trading, spoofing, position concentration and spoof/cancel bursts. Built with ČVUT, MAMA AI and VŠE.",
     tech: ["TypeScript", "Node.js", "Foundry / Solidity", "Real-time events", "AI detectors", "Plugin architecture"],
     highlight: "On-chain surveillance · 8 abuse-detection scenarios",
+    links: [{ label: "deussblockchain.eu", url: "https://deussblockchain.eu/" }],
   },
   {
     name: "Skipper",
@@ -427,44 +269,58 @@ const PROJECTS = [
     flag: "Self-built AI swarm",
     metric: "20+ agents",
     blurb:
-      "A library of custom Claude Code skills and sub-agents I built, tuned and direct: a multi-agent project planner (plan / work / review), researchers, reviewers and debuggers — running in parallel under my orchestration, with adversarial verification before anything ships.",
+      "A library of custom Claude Code skills and sub-agents I built, tuned and direct: a multi-agent project planner (plan / work / review), researchers, reviewers and debuggers, running in parallel under my orchestration, with adversarial verification before anything ships.",
     tech: ["Claude Agent SDK", "MCP servers", "Multi-agent", "Parallel fan-out", "TypeScript"],
-    highlight: "I orchestrate & review — agents don't decide alone",
+    highlight: "Every agent's output goes through my review",
+  },  {
+    name: "SvnTea",
+    cat: "tools",
+    flag: "Internal platform · not public yet",
+    metric: "AI-first forge",
+    blurb:
+      "A modern web forge for Subversion, built because Gitea and Forgejo are Git-only. Repository browsing, diffs, blame and code search read straight from SVN; issues, milestones, labels and API keys live in the forge's own database. Every action the UI can perform is also one scoped REST call, so AI agents can file issues and coordinate in the comment threads.",
+    tech: ["Next.js 16", "React 19", "MUI 7", "Drizzle ORM", "SQLite", "NextAuth v5", "svn CLI"],
+    highlight: "Every UI action is a scoped REST call · agents coordinate in issue threads",
   },
   {
-    name: "Claude Code Manager",
+    name: "ScreenMCP",
     cat: "ai",
-    flag: "AI tooling",
-    metric: "Desktop + TUI + API",
+    flag: "Open source · MIT",
+    metric: "Human-gated desktop vision",
     blurb:
-      "A unified manager for AI coding sessions exposed three ways from one core: terminal TUI, Electron desktop app and a REST API for mobile. Real-time agent status, session search, file editing and diff views.",
-    tech: ["TypeScript", "Electron", "React 19", "xterm.js", "node-pty"],
-    highlight: "IPC architecture · JSONL transcripts as audit log",
+      "Desktop vision for coding agents, with the human holding the switch. One monitor, window or region is shared at a time; an MCP client sees that source and nothing else, through an authenticated endpoint that never leaves localhost. A visible STOP control, redaction masks and a local audit trail keep it from turning into a screen recorder.",
+    tech: ["TypeScript", "Electron", "MCP server", "Node.js", "GitHub Actions"],
+    highlight: "Localhost-only · bearer auth · redaction masks · audit trail",
+    links: [{ label: "github.com/ludekvodicka/ScreenMCP", url: "https://github.com/ludekvodicka/ScreenMCP" }],
   },
   {
     name: "Local Voice-to-Text",
     cat: "ai",
+    flag: "Open source · personal tool",
     metric: "100% local",
     blurb:
-      "A privacy-first hold-to-talk dictation tool running entirely on my own GPU — Whisper/Parakeet ASR with optional LLM filler-cleanup via Ollama. Press a hotkey, speak, release, and the text pastes into any app.",
+      "A privacy-first hold-to-talk dictation tool running entirely on my own GPU: Whisper/Parakeet ASR with optional LLM filler-cleanup via Ollama. Press a hotkey, speak, release, and the text pastes into any app.",
     tech: ["Python", "Whisper / Parakeet", "onnx-asr", "Ollama", "DirectML / CUDA"],
     highlight: "100+ languages · no cloud, ever",
+    links: [{ label: "local-dictate", url: "https://github.com/ludekvodicka/local-dictate" }],
   },
   {
     name: "Content & Marketing AI",
     cat: "ai",
+    flag: "Client work · content automation",
     metric: "Automation",
     blurb:
-      "AI pipelines around my own products: a LinkedIn strategist trained on my real edits, plus SQL-segmented email campaigns for Skipper customers via the Gmail API — with humanising passes that strip the AI tells.",
+      "AI content pipelines built to order: specialised LinkedIn strategies with a strategist trained on the client's own edits, plus SQL-segmented email campaigns for Skipper customers via the Gmail API, with humanising passes that strip the AI tells.",
     tech: ["Claude agents", "MySQL segmentation", "Gmail API", "Humanizer"],
     highlight: "Voice-matched drafts · read-only customer DB",
   },
   {
     name: "VS Code Source-Control Extensions",
-    cat: "ai",
-    metric: "Published",
+    cat: "tools",
+    flag: "Open source · MIT",
+    metric: "Two editor extensions",
     blurb:
-      "Two published VS Code extensions bridging TortoiseGit and TortoiseSVN into the editor — pull, push, commit, log, blame, diff — auto-detecting the install from the Windows registry, with multi-root support.",
+      "Two published VS Code extensions bridging TortoiseGit and TortoiseSVN into the editor (pull, push, commit, log, blame, diff), auto-detecting the install from the Windows registry, with multi-root support.",
     tech: ["VS Code API", "TypeScript", "WinAPI", "Registry detection"],
     highlight: "Windows-native source control inside VS Code",
     links: [
@@ -479,37 +335,71 @@ const PROJECTS = [
     flag: "Moonhill Capital · as CTO",
     metric: "$10M+ raised",
     blurb:
-      "A full Web3 fundraising & token-distribution platform I built as CTO — public dApp plus operator backoffice — and the Solidity core behind it: on-chain deal management, presales, vesting and gas-efficient Merkle-proof claim distribution, with role-based access, KYC and wallet connect across EVM and non-EVM chains.",
+      "A full Web3 fundraising & token-distribution platform I built as CTO (public dApp plus operator backoffice) and the Solidity core behind it: on-chain deal management, presales, vesting and gas-efficient Merkle-proof claim distribution, with role-based access, KYC and wallet connect across EVM and non-EVM chains.",
     tech: ["Solidity", "Hardhat", "OpenZeppelin", "Next.js", "Wagmi / Viem", "Merkle proofs", "Solana", "KYC"],
     highlight: "40+ raises · EVM + non-EVM · AccessControl · SafeERC20 · ReentrancyGuard",
     links: [{ label: "angelssquad.com", url: "https://angelssquad.com/" }],
   },
   {
+    name: "Moonhill Crypto Operations",
+    cat: "web3",
+    flag: "Moonhill Capital · as CTO",
+    metric: "Treasury automation",
+    blurb:
+      "The automation behind the fund's day-to-day crypto operations. Multisig treasury runs check balances, propose batch transactions, collect the signatures and execute on chain, then settle through an exchange and pay out on schedule, with a reconciliation report at the end. The same runner drives node operations and scheduled protocol tasks across EVM, Solana and Cosmos.",
+    tech: ["TypeScript", "Ethers", "CosmJS", "Solana web3.js", "Multisig", "MongoDB"],
+    highlight: "Step-based tasks with their own state, scheduled or run on demand",
+  },
+  {
+    name: "SecretKeeper",
+    cat: "web3",
+    flag: "Internal platform · custody & signing",
+    metric: "Zero keys in code",
+    blurb:
+      "A custody and signing service that keeps private keys and API secrets out of application code. Secrets are encrypted at rest and released through an approval broker: a caller requests access, a human approves or denies it, and every grant is written to an audit log. Signing runs inside the service on isolated signers for EVM, Cosmos and Solana, so callers receive a signature and never the key.",
+    tech: ["TypeScript", "Node.js", "Encrypted storage", "Approval broker", "Audit log", "SSE", "EVM · Cosmos · Solana signers", "MongoDB"],
+    highlight: "Callers get a signature, never a key · every grant approved and logged",
+  },
+  {
+    name: "Jamat",
+    cat: "ai",
+    flag: "Open source · MIT",
+    metric: "Multi-agent terminal",
+    blurb:
+      "An open-source desktop control center for running many Claude Code and Codex sessions in one tiling workspace, and for reaching the sessions on my other machines over the network, including letting one agent operate another's tab. It shows which agent is working and which is waiting on me. Self-hosted, own keys, nothing proxied. Built over five months and used every day.",
+    tech: ["TypeScript", "Electron", "React", "xterm.js", "node-pty", "pnpm monorepo"],
+    highlight: "Installers for Windows · macOS · Linux · auto-update from GitHub Releases",
+    links: [{ label: "github.com/ludekvodicka/jamat", url: "https://github.com/ludekvodicka/jamat" }],
+  },
+  {
     name: "CosmosBot",
     cat: "web3",
+    flag: "Freelance · cross-chain engine",
     metric: "4+ chains",
     blurb:
-      "A multi-blockchain transaction engine that signs and broadcasts across Cosmos, Solana, Ethereum and Injective — handling HD key derivation, cross-standard address encoding and exchange integration.",
+      "A multi-blockchain transaction engine that signs and broadcasts across Cosmos, Solana, Ethereum and Injective, handling HD key derivation, cross-standard address encoding and exchange integration.",
     tech: ["CosmJS", "Solana web3.js", "Ethers", "Injective", "CCXT"],
     highlight: "Cross-chain key derivation & signing",
   },
   {
     name: "Autonomous DeFi Bots",
     cat: "web3",
+    flag: "Freelance · on-chain automation",
     metric: "24/7 on-chain",
     blurb:
-      "Autonomous airdrop-farming and token-sniping bots: Uniswap smart-order routing for pricing, stealth scraping, EVM proxy/factory detection and Merkle-proof farming — across testnets and mainnets, 100+ wallets.",
+      "Autonomous airdrop-farming and token-sniping bots: Uniswap smart-order routing for pricing, stealth scraping, EVM proxy/factory detection and Merkle-proof farming, across testnets and mainnets with 100+ wallets.",
     tech: ["Ethers", "Uniswap SOR", "Puppeteer (stealth)", "Multi-chain"],
     highlight: "Tier-1 sniping · 0G · Aethir · CARV",
   },
   {
     name: "TelegramCryptoBot",
     cat: "web3",
+    flag: "Freelance · trading bot",
     metric: "Multi-chain trading",
     blurb:
-      "A production Telegram trading bot with rich menus and conversations — Uniswap V2/V3 swaps, Solana SPL, Serum DEX and natural-language deadline parsing, with resilient Solana blockhash-expiry handling.",
+      "A production Telegram trading bot with rich menus and conversations: Uniswap V2/V3 swaps, Solana SPL, Serum DEX and natural-language deadline parsing. It handles Solana blockhash expiry with retries.",
     tech: ["Grammy.js", "Uniswap SDK", "Solana", "Serum", "MongoDB"],
-    highlight: "Menus + conversations · resilient tx retry",
+    highlight: "Menus + conversations · tx retry handling",
     groups: ["crypto", "hobby"],
   },
 
@@ -519,22 +409,24 @@ const PROJECTS = [
     flag: "Internal platform",
     metric: "Powers every TS app",
     blurb:
-      "A custom global CLI toolchain (axtoolsv2) for my Node.js stack: git-externals sync with live symlinks, Docker deploy, scaffolding, encrypted backups and Directus migrations — cross-platform Windows & POSIX.",
+      "A custom global CLI toolchain (axtoolsv2) for my Node.js stack: git-externals sync with live symlinks, Docker deploy, scaffolding, encrypted backups and Directus migrations. Cross-platform, Windows & POSIX.",
     tech: ["TypeScript", "Commander.js", "esbuild", "Docker"],
     highlight: "Live shared-code propagation across projects",
   },
   {
     name: "Atomix V2 Backend Framework",
     cat: "backend",
+    flag: "Internal platform",
     metric: "Service framework",
     blurb:
-      "A reusable Node/Express service framework with a clean lifecycle (AxApp start/stop), health-checked REST services, structured logging and a git-externals architecture sharing a common core — Dockerised, tested.",
+      "A reusable Node/Express service framework with a clean lifecycle (AxApp start/stop), health-checked REST services, structured logging and a git-externals architecture sharing a common core. Dockerised and tested.",
     tech: ["TypeScript", "Express", "MongoDB", "Docker", "Mocha"],
     highlight: "The backbone under my backend services",
   },
   {
     name: "Portfolio & Tax Suite",
     cat: "backend",
+    flag: "Personal · crypto accounting",
     metric: "100+ exchanges",
     blurb:
       "Services for multi-chain portfolio tracking and crypto tax accounting: real-time pricing from 100+ exchanges via CCXT, cost-basis and gain/loss calculation, Notion sync and CSV tax-report export.",
@@ -546,10 +438,10 @@ const PROJECTS = [
   {
     name: "Moonhill Capital Platform",
     cat: "web",
-    flag: "As CTO",
+    flag: "Moonhill Capital · as CTO",
     metric: "Investor portal",
     blurb:
-      "The web surface of a VC/token fund: investor portals with impersonation, admin ops with on-chain wallet integration, a node-graph 'labs' workspace, plus news/CMS, email and PDF — one design system.",
+      "The web surface of a VC/token fund: investor portals with impersonation, admin ops with on-chain wallet integration, a node-graph 'labs' workspace, plus news/CMS, email and PDF, all in one design system.",
     tech: ["Next.js 16", "React 19", "MUI 7", "Directus", "Wagmi / Viem", "React Flow"],
     highlight: "Public · admin · labs · investor portal",
     links: [{ label: "moonhill.capital", url: "https://moonhill.capital/" }],
@@ -557,18 +449,20 @@ const PROJECTS = [
   {
     name: "Node Infra Platforms",
     cat: "web",
+    flag: "Two products · shared codebase",
     metric: "SaaS · 3-part",
     blurb:
-      "Mirabia & Nodera — node-network infrastructure SaaS, each a three-part product (public site + operator admin + user app) with React-Flow deployment visualisation, a custom image pipeline and shared code.",
+      "Mirabia & Nodera: node-network infrastructure SaaS, each a three-part product (public site + operator admin + user app) with React-Flow deployment visualisation, a custom image pipeline and shared code.",
     tech: ["Next.js", "React Flow", "Directus", "MongoDB", "Express"],
     highlight: "Public + admin + app, shared codebase",
   },
   {
     name: "Skipper Web & Client Sites",
     cat: "web",
+    flag: "Inventic · commercial web",
     metric: "Live products",
     blurb:
-      "Commercial web around Skipper plus company and client sites — Next.js + Directus marketing sites and an e-commerce/payment flow with Braintree, reCAPTCHA and transaction management for the product store.",
+      "Commercial web around Skipper plus company and client sites: Next.js + Directus marketing sites and an e-commerce/payment flow with Braintree, reCAPTCHA and transaction management for the product store.",
     tech: ["Next.js", "Directus CMS", "Braintree", "NextAuth"],
     highlight: "Marketing + e-commerce + payments",
     links: [{ label: "skipper18.com", url: "https://skipper18.com/" }],
@@ -580,14 +474,15 @@ const PROJECTS = [
     flag: "Founder & owner · since 2006",
     metric: "Team of 5–10",
     blurb:
-      "The software company I founded and run since 2006. Beyond my own products, we delivered websites and warehouse/inventory systems for clients — which meant hiring and leading a team of 5–10, managing people and running projects end to end: scoping, estimates, delivery and support.",
+      "The software company I founded and run since 2006. Beyond my own products, we delivered websites and warehouse/inventory systems for clients. That meant hiring and leading a team of 5–10, managing people and running projects end to end: scoping, estimates, delivery and support.",
     tech: ["Team leadership", "People management", "Project management", "Client delivery", "Hiring", "Web & warehouse systems"],
-    highlight: "Hiring, people & project management — not just code",
+    highlight: "Hiring, people & project management",
     links: [{ label: "inventic.eu", url: "https://inventic.eu/" }],
   },
   {
     name: "CryptoTracker",
     cat: "desktop",
+    flag: "Foundation · C++ engine",
     metric: "Millions of trades/sec",
     blurb:
       "A high-performance market-data engine: a multithreaded message broker aggregates and processes millions of trades and prices per second, feeding a fast evaluation-tree engine for technical indicators.",
@@ -597,22 +492,35 @@ const PROJECTS = [
   {
     name: "Atomix C++ Framework",
     cat: "desktop",
+    flag: "Internal platform · C++",
     metric: "Powers 10+ apps",
     blurb:
-      "My own modular C++ application framework — DI container, plugin system, ORM/AQL layer, HTTP & WebSocket clients, crash reporting and auto-update — the backbone under every native product I've shipped.",
+      "My own modular C++ application framework: DI container, plugin system, ORM/AQL layer, HTTP & WebSocket clients, crash reporting and auto-update. The backbone under every native product I've shipped.",
     tech: ["C++17", "Qt", "Dependency Injection", "Plugins", "OpenSSL"],
     highlight: "axCore · axQt · axApplication · axPlugins",
   },
   {
     name: "ParalelBuilds & Licensing",
     cat: "desktop",
+    flag: "Systems work · C++",
     metric: "Systems-level",
     blurb:
-      "Distributed build system (Incredibuild-style, via DLL injection & API hooking) plus dockerised C++ licensing microservices on Azure/AWS — the kind of deep systems work that taught me how software really runs.",
+      "Distributed build system (Incredibuild-style, via DLL injection & API hooking) plus dockerised C++ licensing microservices on Azure/AWS. The kind of systems work that taught me how software really runs.",
     tech: ["C++", "DLL injection", "API hooking", "Docker", "Azure"],
     highlight: "Process injection · remote execution · licensing",
   },
 
+  {
+    name: "CoinScorer",
+    cat: "web3",
+    flag: "Personal · free alpha",
+    metric: "Crypto trading app",
+    blurb:
+      "A desktop trading app for crypto: portfolio and trade history with fast search, a trade analyser that groups positions by profitability, a market scanner with custom rules, alerts on price or multi-indicator expressions, impermanent-loss simulation and automated orders with several take-profit and stop-loss levels. Client/server, Windows, macOS and Linux, Binance spot only. Released free as an alpha and left there.",
+    tech: ["Binance API", "Technical indicators", "Client / server", "Windows / macOS / Linux"],
+    highlight: "Free alpha · built in spare time",
+    links: [{ label: "github.com/CoinScorer", url: "https://github.com/CoinScorer/CoinScorer" }],
+  },
   {
     name: "Home & IoT automation",
     cat: "iot",
@@ -625,15 +533,78 @@ const PROJECTS = [
   },
 ];
 
+/* ---- Open source - my public repos ------------------------------------ */
+const OSS_REPOS = [
+  {
+    repo: "jamat",
+    name: "Jamat",
+    lang: "TypeScript",
+    tag: "flagship",
+    desc: "Multi-agent terminal: many Claude Code & Codex sessions in one tiling workspace, across machines. MIT, installers for all three platforms.",
+  },
+  {
+    repo: "ScreenMCP",
+    name: "ScreenMCP",
+    lang: "TypeScript",
+    tag: "MCP server",
+    desc: "Human-controlled desktop vision for AI agents: you pick the monitor, window or region. Localhost-only, bearer auth, redaction masks, audit trail.",
+  },
+  {
+    repo: "MeetingRecorder",
+    name: "MeetingRecorder",
+    lang: "Python",
+    tag: "tool",
+    desc: "Dual-track meeting recorder (system audio + mic) with transcription, speaker labels, live translated subtitles and AI summaries.",
+  },
+  {
+    repo: "VifitoDesktop",
+    name: "VifitoDesktop",
+    lang: "TypeScript",
+    tag: "hardware",
+    desc: "A desktop app to drive VIFITO Rio 45 iR infrared devices, and probably the rest of the family.",
+  },
+  {
+    repo: "vscode-tortoise-git",
+    name: "vscode-tortoise-git",
+    lang: "TypeScript",
+    tag: "extension",
+    desc: "TortoiseGit inside VS Code: commit, log, blame and diff, with the install auto-detected from the Windows registry.",
+  },
+  {
+    repo: "vscode-tortoise-svn",
+    name: "vscode-tortoise-svn",
+    lang: "TypeScript",
+    tag: "extension",
+    desc: "The same bridge for TortoiseSVN, with multi-root workspace support.",
+  },
+  {
+    repo: "ikamand",
+    name: "ikamand",
+    lang: "HTML",
+    tag: "hobby",
+    desc: "A replacement app for the iKamand grill controller, written for the barbecue rather than for the CV.",
+  },
+];
+
+const OSS_GH_USER = "ludekvodicka";
+
 /* ---- Career evolution (now → roots) ----------------------------------- */
 const TIMELINE = [
   {
     period: "2025 → now",
-    role: "Directing AI agent swarms",
+    role: "Building modern web, Web3 & AI applications",
     org: "Freelance · Inventic",
-    desc: "Using self-built multi-agent swarms as a force-multiplier — I architect and review, agents execute under direction — to ship classification & reporting pipelines, Telegram community intelligence, and a whole ecosystem of custom Claude Code agents and MCP servers, far faster than before.",
-    tags: ["AI leverage", "Agent swarms", "MCP"],
+    desc: "Shipping products with my own agent tooling: the DEUSS/IDA market-surveillance platform, classification & reporting pipelines, Telegram community intelligence, and an ecosystem of custom Claude Code agents and MCP servers.",
+    tags: ["TypeScript", "Web3", "AI tooling"],
     era: "now",
+  },
+  {
+    period: "2024 → now",
+    role: "Crypto operations & automation",
+    org: "Moonhill Capital",
+    desc: "Automating the fund's crypto operations: multisig treasury runs, exchange settlement, scheduled distribution with reconciliation reporting, plus node operations and protocol tasks across EVM, Solana and Cosmos.",
+    tags: ["Treasury ops", "Multi-chain", "Automation"],
+    era: "core",
   },
   {
     period: "2022 → now",
@@ -655,7 +626,7 @@ const TIMELINE = [
     period: "2014 → now",
     role: "C++ Engineer · Skipper",
     org: "Inventic s.r.o.",
-    desc: "Designed and built Skipper, a cross-platform visual ORM editor & code generator sold globally — Qt GUI, XSLT code generation, TDD and a full Jenkins CI pipeline with signing and notarisation.",
+    desc: "Designed and built Skipper, a cross-platform visual ORM editor & code generator sold globally: Qt GUI, XSLT code generation, TDD and a full Jenkins CI pipeline with signing and notarisation.",
     tags: ["C++", "Qt", "CI/CD"],
     era: "foundation",
   },
@@ -663,7 +634,7 @@ const TIMELINE = [
     period: "2006 → now",
     role: "Owner & Chief Developer",
     org: "Inventic s.r.o.",
-    desc: "Founded and run my own software company — from a C++/MFC warehouse system and high-performance trading engines, growing into developer tooling, infrastructure and a full Web2/Web3/AI stack.",
+    desc: "Founded and run my own software company, from a C++/MFC warehouse system and high-performance trading engines, growing into developer tooling, infrastructure and a full Web2/Web3/AI stack.",
     tags: ["Founder", "C++", "Full-stack"],
     era: "foundation",
   },
@@ -671,8 +642,50 @@ const TIMELINE = [
     period: "2000 → 2006",
     role: "Developer · Consultant",
     org: "Self-employed",
-    desc: "The start of a professional career that began as a kid writing code — early development, consulting and project management that set the foundation for everything since.",
+    desc: "The start of a professional career that began as a kid writing code: early development, consulting and project management that set the foundation for everything since.",
     tags: ["Roots"],
     era: "foundation",
   },
 ];
+
+/* ---- CV-only facts (rendered by cv.js on cv.html; not used by main.js) --- */
+const CV = {
+  name: "Ludek Vodicka",
+  title: "Senior Full-Stack Engineer",
+  tagline: "TypeScript · Node.js · Web3 · Solidity · Next.js · deep C++ roots",
+  contact: {
+    email: "ludek.vodicka@gmail.com",
+    linkedin: "linkedin.com/in/ludekvodicka",
+    github: "github.com/ludekvodicka",
+    web: "ludekvodicka.github.io",
+    location: "Czech Republic",
+  },
+  profile:
+    "Senior full-stack engineer with 25 years of shipped production code, covering architecture, " +
+    "implementation, testing, CI/CD and production operations. Current stack: TypeScript, Node.js, " +
+    "Next.js and Solidity/Web3 on deep C++/Qt foundations. Founder and owner of Inventic s.r.o. and " +
+    "author of Skipper, a visual ORM tool with $1M+ lifetime revenue; as CTO at Moonhill Capital " +
+    "built the Web3 platforms behind $10M+ raised across 40+ token sales. Day-to-day delivery is " +
+    "accelerated by multi-agent AI tooling I built and maintain myself; the architecture and the " +
+    "responsibility for what ships stay with me.",
+  /* labels for STACK eras as rendered in the CV Skills section (tags come from STACK[].tags) */
+  skillLabels: {
+    core: "Core stack",
+    now: "AI-assisted delivery",
+    infra: "Cloud & DevOps",
+    foundation: "C++ & systems",
+  },
+  /* whitelist of OSS_REPOS[].repo rendered in the Open Source section */
+  ossRepos: ["jamat", "ScreenMCP", "vscode-tortoise-git", "vscode-tortoise-svn"],
+  education: [
+    { period: "2004-2007", degree: "Master's degree, Applied Informatics",
+      school: "Masaryk University, Faculty of Informatics, Brno" },
+    { period: "2000-2004", degree: "Bachelor's degree, Applied Informatics",
+      school: "Masaryk University, Faculty of Informatics, Brno" },
+  ],
+  languages: ["English: daily working language", "Czech: native"],
+  cooperation: [
+    "B2B contract work, project by project",
+    "Remote-native · CET · not actively job hunting, open to interesting contracts",
+  ],
+};
