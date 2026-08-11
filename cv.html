@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ludek Vodicka · CV · engineering dossier</title>
+  <meta name="description" content="The full dossier: 25 years of shipped production code, from a $1M+ C++ dev tool to Web3 platforms behind $10M+ raised. Selected work, open source, stack, how I work, and the career that got here. TypeScript, Node.js, Web3, Next.js on deep C++ roots." />
+  <meta property="og:title" content="Ludek Vodicka · CV · engineering dossier" />
+  <meta property="og:description" content="25 years of shipping production code: a $1M+ dev tool in C++, $10M+ raised on Web3 platforms I built as CTO. Today I ship faster with AI tooling I wrote myself. Open to contract work." />
+  <meta property="og:type" content="profile" />
+  <meta property="og:url" content="https://ludekvodicka.github.io/cv.html" />
+  <meta property="og:image" content="https://ludekvodicka.github.io/assets/img/og-cover.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Ludek Vodicka, senior engineer open to contract work. TypeScript, Solidity, Web3, deep C++ roots." />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="canonical" href="https://ludekvodicka.github.io/cv.html" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;1,400;1,500&display=swap" rel="stylesheet" />
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23f5f3ee'/%3E%3Crect x='7' y='7' width='86' height='86' fill='none' stroke='%23191b1f' stroke-width='6'/%3E%3Ctext x='50' y='68' font-family='monospace' font-size='44' font-weight='700' text-anchor='middle' fill='%23244297'%3ELV%3C/text%3E%3C/svg%3E" />
+
+  <!-- JSON-LD Person lives on the home page, one Person per site -->
+
+  <link rel="stylesheet" href="assets/css/styles.css" />
+
+  <script async data-id="101509832" src="//static.getclicky.com/js"></script>
+</head>
+<body data-page="cv">
+  <!-- SHARED SHELL: keep in sync across index.html / cv.html / projects.html.
+       Per-page differences: the tab carrying aria-current, the .topnav items,
+       and body[data-page]. Everything else in the marked blocks is verbatim. -->
+  <noscript>
+    <div class="noscript">
+      <p><strong>This page renders its content with JavaScript</strong>, which is switched off in your
+      browser, so most of it is not visible. My work history and contact details are on
+      <a href="https://www.linkedin.com/in/ludekvodicka/">LinkedIn</a>, my code is on
+      <a href="https://github.com/ludekvodicka">GitHub</a>, and you can reach me at
+      <a href="mailto:ludek.vodicka@gmail.com">ludek.vodicka@gmail.com</a>.</p>
+    </div>
+  </noscript>
+  <a class="skiplink" href="#top">Skip to content</a>
+  <div class="progress" id="progress" aria-hidden="true"></div>
+
+  <!-- ===================== MASTHEAD / NAV ===================== -->
+  <header class="topbar" id="topbar">
+    <div class="topbar__inner">
+      <a href="index.html" class="brand" aria-label="Home">
+        <span class="brand__mark">LV</span>
+        <span class="brand__name">Ludek Vodicka</span>
+        <span class="brand__doc">engineering dossier</span>
+      </a>
+      <nav class="tabnav" aria-label="Site">
+        <a href="index.html">Home</a>
+        <a href="cv.html" aria-current="page">CV</a>
+        <a href="projects.html">Projects</a>
+      </nav>
+      <div class="topbar__side">
+        <a href="https://github.com/ludekvodicka" class="topbar__gh" target="_blank" rel="noopener" aria-label="GitHub (opens in a new tab)">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56 0-.28-.01-1.02-.02-2-3.19.7-3.87-1.54-3.87-1.54-.52-1.33-1.28-1.68-1.28-1.68-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.69 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.12 3.05.74.81 1.18 1.83 1.18 3.09 0 4.42-2.69 5.39-5.25 5.68.41.36.78 1.06.78 2.14 0 1.55-.01 2.8-.01 3.18 0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5z"/></svg>
+        </a>
+        <a href="#contact" class="btn btn--ink btn--sm topbar__cta">Get in touch</a>
+      </div>
+      <nav class="topnav" aria-label="Sections">
+        <a href="#work"><i>01</i>Work</a>
+        <a href="#oss"><i>02</i>Open source</a>
+        <a href="#security"><i>03</i>Security</a>
+        <a href="#system"><i>04</i>System</a>
+        <a href="#stack"><i>05</i>Stack</a>
+        <a href="#toolbox"><i>06</i>Toolbox</a>
+        <a href="#method"><i>07</i>How I work</a>
+        <a href="#journey"><i>08</i>Journey</a>
+        <a href="#looking"><i>09</i>Hiring me</a>
+      </nav>
+    </div>
+  </header>
+  <!-- END SHARED SHELL -->
+
+  <main id="top">
+    <!-- ===================== HERO ===================== -->
+    <section class="hero" id="hero">
+      <div class="sheet reveal">
+        <span class="sheet__corner sheet__corner--tl" aria-hidden="true"></span>
+        <span class="sheet__corner sheet__corner--tr" aria-hidden="true"></span>
+        <span class="sheet__corner sheet__corner--bl" aria-hidden="true"></span>
+        <span class="sheet__corner sheet__corner--br" aria-hidden="true"></span>
+        <p class="hero__eyebrow">
+          <span class="status-dot" aria-hidden="true"></span>
+          Senior engineer &amp; technical lead · open to contract work · remote · CET
+        </p>
+        <h1 class="hero__title">
+          <span class="hero__hi">Hi, I'm</span>
+          <span class="hero__name">Ludek Vodicka<span class="hero__dot">.</span></span>
+        </h1>
+        <h2 class="hero__role">
+          <span class="hero__role-static">I build</span>
+          <span class="hero__role-rotator" id="roleRotator" aria-hidden="true"></span>
+          <span class="sr-only">complete systems, end to end: TypeScript and Node.js backends, Web3 platforms and Solidity contracts, Next.js products, on 25 years of C++ foundations.</span>
+        </h2>
+        <p class="hero__lead">
+          <strong>25 years of shipping complete systems</strong> and owning them in production,
+          from architecture to delivery. These days an AI toolchain I built myself does the
+          heavy typing; <strong>the design stays mine, and so does the responsibility for what ships</strong>.
+        </p>
+        <p class="hero__stackline">TypeScript · Node.js · Web3 · Solidity · Next.js, with deep C++ roots.</p>
+        <div class="hero__cta">
+          <a href="#work" class="btn btn--accent">See my work
+            <svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          <a href="#contact" class="btn btn--line">Let's talk</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== STATS ===================== -->
+    <section class="stats" id="stats" aria-label="Key numbers">
+      <div class="stats__grid reveal">
+        <div class="stat"><div class="stat__num"><span class="counter" data-target="25" data-suffix="+">0</span></div><div class="stat__label">Years shipping code</div></div>
+        <div class="stat"><div class="stat__num">$<span class="counter" data-target="10" data-suffix="M+">0</span></div><div class="stat__label">Raised via Web3 platforms I built</div></div>
+        <div class="stat"><div class="stat__num">$<span class="counter" data-target="1" data-suffix="M+">0</span></div><div class="stat__label">Revenue from my product, Skipper</div></div>
+        <div class="stat"><div class="stat__num"><span class="counter" data-target="20" data-suffix="+">0</span></div><div class="stat__label">Production-grade projects</div></div>
+        <div class="stat"><div class="stat__num"><span class="counter" data-target="80" data-suffix="+">0</span></div><div class="stat__label">Countries with Skipper customers</div></div>
+      </div>
+    </section>
+
+    <!-- ===================== WORK ===================== -->
+    <section class="section work" id="work">
+      <header class="section__head reveal">
+        <span class="section__no" aria-hidden="true">01</span>
+        <div class="section__headbody">
+          <p class="section__kicker">Selected work</p>
+          <h2 class="section__title">Things I've designed, built &amp; shipped</h2>
+          <p class="section__sub">Showing my <strong>top-tier</strong> work by default: the projects that made money or made a name. Switch to All or pick a category for the rest.</p>
+        </div>
+      </header>
+      <div class="work__bar reveal">
+        <div class="work__filters" id="workFilters" role="group" aria-label="Filter projects"><!-- injected --></div>
+        <p class="work__hint" aria-hidden="true">
+          <svg class="work__hint-arrow" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+          click <strong>All</strong> or change category to see more
+        </p>
+      </div>
+      <div class="work__grid" id="workGrid"><!-- injected --></div>
+      <p class="work__foot reveal">
+        <a href="projects.html" class="ilink">
+          The full catalogue, grouped by open source, live products and internal platforms
+          <svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </p>
+    </section>
+
+    <!-- ===================== OPEN SOURCE ===================== -->
+    <section class="section oss" id="oss">
+      <header class="section__head reveal">
+        <span class="section__no" aria-hidden="true">02</span>
+        <div class="section__headbody">
+          <p class="section__kicker">Open source</p>
+          <h2 class="section__title">Code you can <em>read</em> today</h2>
+          <p class="section__sub">
+            Most of what I build is commercial and closed. Here is a selection of what is not: real
+            tools I use daily, published under my own name. Clone them, run them, judge the code.
+          </p>
+        </div>
+      </header>
+      <div class="oss__list reveal" id="ossList"><!-- injected --></div>
+      <p class="oss__foot reveal">
+        <a href="https://github.com/ludekvodicka" target="_blank" rel="noopener" class="ilink">
+          All repositories on GitHub
+          <svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a href="projects.html" class="ilink">
+          All projects, including the closed-source ones
+          <svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </p>
+    </section>
+
+    <!-- ===================== SECURITY ===================== -->
+    <section class="section security" id="security">
+      <header class="section__head reveal">
+        <span class="section__no" aria-hidden="true">03</span>
+        <div class="section__headbody">
+          <p class="section__kicker">Security &amp; key custody</p>
+          <h2 class="section__title">How I keep <em>funds</em> safe</h2>
+          <p class="section__sub">In crypto, one weak key or one re-entrant call drains everything. I build like the funds are real, because they are.</p>
+        </div>
+      </header>
+      <div class="security__grid">
+        <article class="sec-card reveal">
+          <div class="sec-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4.2"/></svg></div>
+          <h3>Security mindset</h3>
+          <p>Least privilege, defense in depth, nothing trusted by default.</p>
+          <ul class="sec-card__tags"><li>threat-modelling</li><li>least privilege</li><li>zero-trust</li></ul>
+        </article>
+        <article class="sec-card reveal">
+          <div class="sec-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/><path d="M9 13h6M9 17h4"/></svg></div>
+          <h3>Smart contracts</h3>
+          <p>Audited patterns, no shortcuts.</p>
+          <ul class="sec-card__tags"><li>ReentrancyGuard</li><li>SafeERC20</li><li>AccessControl</li><li>Merkle</li></ul>
+        </article>
+        <article class="sec-card reveal">
+          <div class="sec-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="4"/><path d="M11 11l8 8M16 16l2-2M18 18l1.5-1.5"/></svg></div>
+          <h3>Key custody</h3>
+          <p>Keys encrypted at rest, isolated from app logic.</p>
+          <ul class="sec-card__tags"><li>encrypted store</li><li>isolated signers</li></ul>
+        </article>
+        <article class="sec-card reveal">
+          <div class="sec-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 14.5l5-5"/><path d="M11 6.5l1-1a4 4 0 0 1 5.5 5.5l-1.5 1.5"/><path d="M13 17.5l-1 1a4 4 0 0 1-5.5-5.5L8 11.5"/></svg></div>
+          <h3>Multi-chain &amp; opsec</h3>
+          <p>Deterministic HD wallets, secrets out of logs.</p>
+          <ul class="sec-card__tags"><li>BIP32/39/44</li><li>multi-chain</li></ul>
+        </article>
+      </div>
+    </section>
+
+    <!-- ===================== SYSTEM DIAGRAM ===================== -->
+    <section class="section system" id="system">
+      <header class="section__head reveal">
+        <span class="section__no" aria-hidden="true">04</span>
+        <div class="section__headbody">
+          <p class="section__kicker">Under the hood</p>
+          <h2 class="section__title">A typical product of mine, end to end.</h2>
+          <p class="section__sub">Every box is a real part of how I ship. Each travelling dot is coloured by what its line carries.</p>
+        </div>
+      </header>
+      <figure class="figure reveal">
+        <figcaption class="figure__cap"><span class="figure__no">Fig. 01</span> Delivery system: hover a component to trace its connections</figcaption>
+        <div class="archmap" id="mapProduct" role="img" aria-label="The client on the left uses the web and the CLI; what we built sits in the centre (web frontend, API server, backend and workers, C++ engine, smart contracts); external services (databases, event queue, MQTT, object storage, EVM chains) and AI services (LLM, vector/RAG, agents) are on the right; everything is dockerized. Travelling dots are coloured by communication channel."></div>
+        <div class="figure__legend chan-legend" aria-label="Channels">
+          <span class="lg lg--user"><i></i>user request</span>
+          <span class="lg lg--app"><i></i>app / internal</span>
+          <span class="lg lg--data"><i></i>database</span>
+          <span class="lg lg--chain"><i></i>blockchain</span>
+          <span class="lg lg--ai"><i></i>AI</span>
+          <span class="lg lg--infra"><i></i>infra / services</span>
+        </div>
+      </figure>
+    </section>
+
+    <!-- ===================== STACK ===================== -->
+    <section class="section stack" id="stack">
+      <header class="section__head reveal">
+        <span class="section__no" aria-hidden="true">05</span>
+        <div class="section__headbody">
+          <p class="section__kicker">The stack, by era</p>
+          <h2 class="section__title">Current work first, foundations underneath</h2>
+          <p class="section__sub">
+            The first card is what I ship on every day. The AI layer is how I ship it faster.
+            C++ &amp; MySQL are the roots underneath.
+          </p>
+        </div>
+      </header>
+      <div class="stack__rows" id="stackGrid"><!-- injected --></div>
+    </section>
+
+    <!-- ===================== TOOLBOX / WORD CLOUD ===================== -->
+    <section class="section wordcloud" id="toolbox">
+      <header class="section__head reveal">
+        <span class="section__no" aria-hidden="true">06</span>
+        <div class="section__headbody">
+          <p class="section__kicker">Toolbox</p>
+          <h2 class="section__title">Everything in my <em>toolbox</em></h2>
+          <p class="section__sub">
+            Languages, frameworks, libraries, tools, patterns and the domains I've shipped in,
+            pulled from 25 years of CV and projects. Size = how central it is to my work; hover a
+            word to isolate its family.
+          </p>
+        </div>
+      </header>
+      <figure class="figure reveal">
+        <figcaption class="figure__cap"><span class="figure__no">Fig. 02</span> Toolbox, weighted by how central each item is</figcaption>
+        <div class="wordcloud__stage" id="wcStage"></div>
+        <div class="figure__legend wordcloud__legend" id="wcLegend" aria-hidden="true"></div>
+      </figure>
+    </section>
+    <div class="wc-tip" id="wcTip" aria-hidden="true"></div>
+
+    <!-- ===================== HOW I WORK ===================== -->
+    <section class="section method" id="method">
+      <header class="section__head reveal">
+        <span class="section__no" aria-hidden="true">07</span>
+        <div class="section__headbody">
+          <p class="section__kicker">How I work now</p>
+          <h2 class="section__title">How I build with an <em>agent swarm</em></h2>
+          <p class="section__sub">
+            I built the swarm that does the heavy typing. I still decide what gets built and
+            whether what comes back is good enough to ship.
+          </p>
+        </div>
+      </header>
+
+
+      <h3 class="method__subhead reveal">Where the day goes now</h3>
+      <p class="method__line reveal">I hand-write a fraction of the code now. The rest of the day is architecture, implementation plans, task briefs for the agents, and code review of every diff that comes back.</p>
+      <div class="workshift reveal" id="workshift" role="img" aria-label="How AI reshaped my workflow: 50% architecture, plans and task briefs, 20% writing code by hand, 30% review."></div>
+
+      <h3 class="method__subhead reveal">How a feature actually gets built</h3>
+      <ol class="process reveal" id="processFlow"><!-- injected --></ol>
+    </section>
+
+    <!-- ===================== JOURNEY ===================== -->
+    <section class="section journey" id="journey">
+      <header class="section__head reveal">
+        <span class="section__no" aria-hidden="true">08</span>
+        <div class="section__headbody">
+          <p class="section__kicker">Evolution</p>
+          <h2 class="section__title">From C++ systems → Web3 → modern web &amp; AI apps</h2>
+          <p class="section__sub">How I got from native C++ desktop software to building modern Web2, Web3 and AI applications.</p>
+        </div>
+      </header>
+      <div class="timeline" id="timeline"><!-- injected --></div>
+    </section>
+
+    <!-- ===================== LOOKING ===================== -->
+    <section class="section looking" id="looking">
+      <header class="section__head reveal">
+        <span class="section__no" aria-hidden="true">09</span>
+        <div class="section__headbody">
+          <p class="section__kicker">What I'm looking for</p>
+          <h2 class="section__title">The kind of work I say yes to</h2>
+          <p class="section__sub">
+            I am not job hunting. I have my own products and clients and enough to do. What I am
+            open to is contract work: bring me a genuinely interesting problem at a rate that
+            matches it, and I will make room for it.
+          </p>
+        </div>
+      </header>
+      <div class="looking__grid">
+        <article class="looking__card reveal">
+          <div class="looking__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.8 2.6 4.2 5.6 4.2 9S14.8 18.4 12 21c-2.8-2.6-4.2-5.6-4.2-9S9.2 5.6 12 3z"/></svg></div>
+          <h3>Full remote</h3><p>Remote-native and async-friendly. I've worked distributed across timezones for years, on CET.</p>
+        </article>
+        <article class="looking__card reveal">
+          <div class="looking__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2.2 5-4.8 2 2.2-5z"/></svg></div>
+          <h3>Full autonomy</h3><p>Give me the problem and the context, and I'll own the outcome, decisions included.</p>
+        </article>
+        <article class="looking__card reveal">
+          <div class="looking__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V8l7-5 7 5v13"/><path d="M9 21v-6h6v6M9 11h.01M15 11h.01"/></svg></div>
+          <h3>Architecture → delivery</h3><p>System design, implementation, testing, CI/CD and deployment. I take a feature from first sketch to production.</p>
+        </article>
+        <article class="looking__card reveal">
+          <div class="looking__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.5" cy="8.5" r="3"/><circle cx="16.5" cy="9.5" r="2.4"/><path d="M3.5 19.5a5 5 0 0 1 10 0M13.4 15.6a4.2 4.2 0 0 1 7.1 3.9"/></svg></div>
+          <h3>Small, focused teams</h3><p>High-trust teams on genuinely hard problems. Senior IC or technical leadership both fit.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- ===================== CONTACT ===================== -->
+    <section class="section contact" id="contact">
+      <div class="contact__panel reveal">
+        <p class="contact__kicker">10 · Contact</p>
+        <h2 class="contact__title">Hiring for something <em>hard</em>?</h2>
+        <p class="contact__sub">Got a contract that needs an engineer who can own it end to end, AI swarm included? Tell me what it is and I will tell you straight whether I can take it.</p>
+        <div class="contact__actions">
+          <a href="mailto:ludek.vodicka@gmail.com" class="btn btn--paper btn--lg">
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M3 7l9 6 9-6M4 5h16a1 1 0 011 1v12a1 1 0 01-1 1H4a1 1 0 01-1-1V6a1 1 0 011-1z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            ludek.vodicka@gmail.com
+          </a>
+          <a href="assets/cv/Ludek-Vodicka-CV.pdf" target="_blank" rel="noopener" class="btn btn--paperline btn--lg" aria-label="Résumé (PDF, opens in a new tab)">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V7z"/><path d="M14 3v4h4M9 13h6M9 17h6M9 9.5h1.5"/></svg>
+            Résumé (PDF)
+          </a>
+          <a href="https://www.linkedin.com/in/ludekvodicka/" target="_blank" rel="noopener" class="btn btn--paperline btn--lg">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M6.94 5a1.94 1.94 0 11-3.88 0 1.94 1.94 0 013.88 0zM3.4 8.4h3.1V21H3.4V8.4zM9.3 8.4h2.97v1.72h.04c.41-.78 1.42-1.6 2.93-1.6 3.13 0 3.71 2.06 3.71 4.74V21h-3.1v-5.6c0-1.34-.02-3.06-1.86-3.06-1.87 0-2.15 1.46-2.15 2.96V21H9.3V8.4z"/></svg>
+            in/ludekvodicka
+          </a>
+          <a href="https://github.com/ludekvodicka" target="_blank" rel="noopener" class="btn btn--paperline btn--lg">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56 0-.28-.01-1.02-.02-2-3.19.7-3.87-1.54-3.87-1.54-.52-1.33-1.28-1.68-1.28-1.68-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.69 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.12 3.05.74.81 1.18 1.83 1.18 3.09 0 4.42-2.69 5.39-5.25 5.68.41.36.78 1.06.78 2.14 0 1.55-.01 2.8-.01 3.18 0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5z"/></svg>
+            github.com/ludekvodicka
+          </a>
+        </div>
+        <ul class="contact__meta">
+          <li>Czech Republic</li>
+          <li>CET · remote-native</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <!-- SHARED SHELL: footer -->
+  <footer class="footer">
+    <div class="footer__inner">
+      <span class="footer__mark">LV</span>
+      <p>© <span id="year"></span> Ludek Vodicka · <a href="https://github.com/ludekvodicka" class="ilink" target="_blank" rel="noopener">GitHub</a> · <a href="https://www.linkedin.com/in/ludekvodicka/" class="ilink" target="_blank" rel="noopener">LinkedIn</a></p>
+      <a href="#top" class="footer__top">Back to top ↑</a>
+    </div>
+  </footer>
+  <!-- END SHARED SHELL -->
+
+  <script defer src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/d3-cloud@1.2.7/build/d3.layout.cloud.js"></script>
+  <script defer src="assets/js/data.js"></script>
+  <script defer src="assets/js/main.js"></script>
+</body>
+</html>

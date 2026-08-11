@@ -266,7 +266,8 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .hero__dot { color: var(--accent); }
 .hero__role { font-size: clamp(1.15rem, 2.8vw, 1.7rem); font-weight: 500; margin: 1.3rem 0 1.5rem; min-height: 1.5em; letter-spacing: -0.015em; }
 .hero__role-static { color: var(--ink-mute); font-weight: 400; }
-.hero__role-rotator {
+/* --fixed is the home page's version: same treatment, no typing, no caret */
+.hero__role-rotator, .hero__role-fixed {
   color: var(--ink); margin-left: 0.45rem;
   border-bottom: 2px solid var(--accent); padding: 0 2px 1px;
 }
@@ -406,8 +407,8 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .oss-row__desc { grid-column: 1 / -1; color: var(--ink-dim); font-size: 0.85rem; margin: 0.15rem 0 0; max-width: 58ch; }
 .oss-row__go { grid-column: 1 / -1; font-family: var(--font-mono); font-size: 0.68rem; color: var(--accent-deep); opacity: 0; transition: opacity 0.2s; margin-top: 0.2rem; }
 .oss-row:hover .oss-row__go, .oss-row:focus-visible .oss-row__go { opacity: 1; }
-.oss__foot { margin-top: 1.6rem; font-family: var(--font-mono); font-size: 0.8rem; }
-.oss__foot .ilink { display: inline-flex; align-items: center; gap: 0.35rem; }
+.oss__foot, .work__foot { margin-top: 1.6rem; font-family: var(--font-mono); font-size: 0.8rem; display: flex; flex-wrap: wrap; gap: 0.4rem 1.8rem; }
+.oss__foot .ilink, .work__foot .ilink { display: inline-flex; align-items: center; gap: 0.35rem; }
 
 /* =========================================================================
    DOWNLOADS — home strip; one row per tool, one button per platform
