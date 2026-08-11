@@ -243,6 +243,7 @@ const PROJECTS = [
   {
     name: "DEUSS / IDA",
     cat: "web3",
+    source: "online",
     groups: ["crypto", "ai"],
     flag: "ČVUT · reference project",
     metric: "Market surveillance",
@@ -255,6 +256,7 @@ const PROJECTS = [
   {
     name: "Skipper",
     cat: "desktop",
+    source: "online",
     flag: "Flagship · 12+ years",
     metric: "$1M+ revenue",
     blurb:
@@ -266,6 +268,7 @@ const PROJECTS = [
   {
     name: "Claude Skill & Swarm Ecosystem",
     cat: "ai",
+    source: "internal",
     flag: "Self-built AI swarm",
     metric: "20+ agents",
     blurb:
@@ -275,6 +278,7 @@ const PROJECTS = [
   },  {
     name: "SvnTea",
     cat: "tools",
+    source: "internal",
     flag: "Internal platform · not public yet",
     metric: "AI-first forge",
     blurb:
@@ -285,6 +289,7 @@ const PROJECTS = [
   {
     name: "ScreenMCP",
     cat: "ai",
+    source: "oss",
     flag: "Open source · MIT",
     metric: "Human-gated desktop vision",
     blurb:
@@ -296,6 +301,7 @@ const PROJECTS = [
   {
     name: "Local Voice-to-Text",
     cat: "ai",
+    source: "oss",
     flag: "Open source · personal tool",
     metric: "100% local",
     blurb:
@@ -307,6 +313,7 @@ const PROJECTS = [
   {
     name: "Content & Marketing AI",
     cat: "ai",
+    source: "internal",
     flag: "Client work · content automation",
     metric: "Automation",
     blurb:
@@ -317,6 +324,7 @@ const PROJECTS = [
   {
     name: "VS Code Source-Control Extensions",
     cat: "tools",
+    source: "oss",
     flag: "Open source · MIT",
     metric: "Two editor extensions",
     blurb:
@@ -332,6 +340,7 @@ const PROJECTS = [
   {
     name: "AngelsSquad Launchpad",
     cat: "web3",
+    source: "online",
     flag: "Moonhill Capital · as CTO",
     metric: "$10M+ raised",
     blurb:
@@ -343,6 +352,7 @@ const PROJECTS = [
   {
     name: "Moonhill Crypto Operations",
     cat: "web3",
+    source: "internal",
     flag: "Moonhill Capital · as CTO",
     metric: "Treasury automation",
     blurb:
@@ -353,6 +363,7 @@ const PROJECTS = [
   {
     name: "SecretKeeper",
     cat: "web3",
+    source: "internal",
     flag: "Internal platform · custody & signing",
     metric: "Zero keys in code",
     blurb:
@@ -363,6 +374,7 @@ const PROJECTS = [
   {
     name: "Jamat",
     cat: "ai",
+    source: "oss",
     flag: "Open source · MIT",
     metric: "Multi-agent terminal",
     blurb:
@@ -374,6 +386,7 @@ const PROJECTS = [
   {
     name: "CosmosBot",
     cat: "web3",
+    source: "internal",
     flag: "Freelance · cross-chain engine",
     metric: "4+ chains",
     blurb:
@@ -384,6 +397,7 @@ const PROJECTS = [
   {
     name: "Autonomous DeFi Bots",
     cat: "web3",
+    source: "internal",
     flag: "Freelance · on-chain automation",
     metric: "24/7 on-chain",
     blurb:
@@ -394,6 +408,7 @@ const PROJECTS = [
   {
     name: "TelegramCryptoBot",
     cat: "web3",
+    source: "internal",
     flag: "Freelance · trading bot",
     metric: "Multi-chain trading",
     blurb:
@@ -406,6 +421,7 @@ const PROJECTS = [
   {
     name: "AtomixToolsV2",
     cat: "backend",
+    source: "internal",
     flag: "Internal platform",
     metric: "Powers every TS app",
     blurb:
@@ -416,6 +432,7 @@ const PROJECTS = [
   {
     name: "Atomix V2 Backend Framework",
     cat: "backend",
+    source: "internal",
     flag: "Internal platform",
     metric: "Service framework",
     blurb:
@@ -426,6 +443,7 @@ const PROJECTS = [
   {
     name: "Portfolio & Tax Suite",
     cat: "backend",
+    source: "internal",
     flag: "Personal · crypto accounting",
     metric: "100+ exchanges",
     blurb:
@@ -438,6 +456,7 @@ const PROJECTS = [
   {
     name: "Moonhill Capital Platform",
     cat: "web",
+    source: "online",
     flag: "Moonhill Capital · as CTO",
     metric: "Investor portal",
     blurb:
@@ -449,6 +468,7 @@ const PROJECTS = [
   {
     name: "Node Infra Platforms",
     cat: "web",
+    source: "internal",
     flag: "Two products · shared codebase",
     metric: "SaaS · 3-part",
     blurb:
@@ -459,6 +479,7 @@ const PROJECTS = [
   {
     name: "Skipper Web & Client Sites",
     cat: "web",
+    source: "online",
     flag: "Inventic · commercial web",
     metric: "Live products",
     blurb:
@@ -471,6 +492,7 @@ const PROJECTS = [
   {
     name: "Inventic s.r.o.",
     cat: "company",
+    source: "online",
     flag: "Founder & owner · since 2006",
     metric: "Team of 5–10",
     blurb:
@@ -482,6 +504,7 @@ const PROJECTS = [
   {
     name: "CryptoTracker",
     cat: "desktop",
+    source: "internal",
     flag: "Foundation · C++ engine",
     metric: "Millions of trades/sec",
     blurb:
@@ -492,6 +515,7 @@ const PROJECTS = [
   {
     name: "Atomix C++ Framework",
     cat: "desktop",
+    source: "internal",
     flag: "Internal platform · C++",
     metric: "Powers 10+ apps",
     blurb:
@@ -502,6 +526,7 @@ const PROJECTS = [
   {
     name: "ParalelBuilds & Licensing",
     cat: "desktop",
+    source: "internal",
     flag: "Systems work · C++",
     metric: "Systems-level",
     blurb:
@@ -513,6 +538,7 @@ const PROJECTS = [
   {
     name: "CoinScorer",
     cat: "web3",
+    source: "oss",
     flag: "Personal · free alpha",
     metric: "Crypto trading app",
     blurb:
@@ -524,6 +550,7 @@ const PROJECTS = [
   {
     name: "Home & IoT automation",
     cat: "iot",
+    source: "internal",
     flag: "Personal · hobby",
     metric: "My own smart home",
     blurb:
@@ -587,6 +614,54 @@ const OSS_REPOS = [
 ];
 
 const OSS_GH_USER = "ludekvodicka";
+
+/* ---- Home page - the things a visitor can install or clone today -------
+   Each row names exactly one of `project` (joins PROJECTS by name) or `repo`
+   (joins OSS_REPOS by repo), so the description is never retyped here.
+   `release` marks a repo that publishes GitHub releases: the row renders one
+   button per platform, and main.js upgrades them to direct asset URLs.       */
+const HOME = {
+  downloads: [
+    {
+      name: "Jamat",
+      project: "Jamat",
+      kind: "Desktop app · installers",
+      url: "https://github.com/ludekvodicka/jamat/releases",
+      release: { owner: "ludekvodicka", repo: "jamat" },
+    },
+    {
+      name: "Skipper",
+      project: "Skipper",
+      kind: "Free trial",
+      url: "https://skipper18.com/",
+    },
+    {
+      name: "ScreenMCP",
+      project: "ScreenMCP",
+      kind: "MCP server · installers",
+      url: "https://github.com/ludekvodicka/ScreenMCP/releases",
+      release: { owner: "ludekvodicka", repo: "ScreenMCP" },
+    },
+    {
+      name: "Local Voice-to-Text",
+      project: "Local Voice-to-Text",
+      kind: "Python tool · clone",
+      url: "https://github.com/ludekvodicka/local-dictate",
+    },
+    {
+      name: "vscode-tortoise-git",
+      repo: "vscode-tortoise-git",
+      kind: "VS Code extension",
+      url: "https://github.com/ludekvodicka/vscode-tortoise-git",
+    },
+    {
+      name: "vscode-tortoise-svn",
+      repo: "vscode-tortoise-svn",
+      kind: "VS Code extension",
+      url: "https://github.com/ludekvodicka/vscode-tortoise-svn",
+    },
+  ],
+};
 
 /* ---- Career evolution (now → roots) ----------------------------------- */
 const TIMELINE = [

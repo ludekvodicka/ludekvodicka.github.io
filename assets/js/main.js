@@ -305,13 +305,11 @@
       return `<button type="button" class="chip-filter${on ? " is-active" : ""}" data-filter="${f.id}" aria-pressed="${on}">${f.label}</button>`;
     }).join("");
   }
-  function renderProjects() {
-    const grid = $("#workGrid");
-    if (!grid || typeof PROJECTS === "undefined") return;
-    grid.innerHTML = PROJECTS.map((p, i) => {
-      const tier = tierOf(p);
-      return `
-      <article class="pcard pcard--${p.cat} tier-${tier} reveal${tier === "top" ? "" : " is-hidden"}" data-cat="${p.cat}" data-tier="${tier}" data-groups="${groupsOf(p)}" style="--d:${(i % 6) * 55}ms">
+  /* one card, one markup - shared by the dossier grid and the grouped catalog */
+  function pcardHTML(p, i, hidden) {
+    const tier = tierOf(p);
+    return `
+      <article class="pcard pcard--${p.cat} tier-${tier} reveal${hidden ? " is-hidden" : ""}" data-cat="${p.cat}" data-tier="${tier}" data-groups="${groupsOf(p)}" style="--d:${(i % 6) * 55}ms">
         <div class="pcard__top"><span class="pcard__cat">${catLabel(p.cat)}</span>${p.metric ? `<span class="pcard__metric">${p.metric}</span>` : ""}</div>
         ${tier === "top" ? `<span class="pcard__tier">★ top-tier</span>` : ""}
         ${p.flag ? `<span class="pcard__flag">${p.flag}</span>` : ""}
@@ -321,7 +319,21 @@
         <ul class="pcard__tech">${p.tech.map((t) => `<li>${t}</li>`).join("")}</ul>
         ${(p.links && p.links.length) ? `<div class="pcard__links">${p.links.map((l) => `<a href="${l.url}" class="pcard__link" target="_blank" rel="noopener">${l.label}<svg viewBox="0 0 24 24" width="11" height="11" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>`).join("")}</div>` : ""}
       </article>`;
-    }).join("");
+  }
+  function renderProjects() {
+    const grid = $("#workGrid");
+    if (!grid || typeof PROJECTS === "undefined") return;
+    grid.innerHTML = PROJECTS.map((p, i) => pcardHTML(p, i, tierOf(p) !== "top")).join("");
+  }
+  /* projects.html - the full catalog, split by how the code is available.
+     `source` is a third axis: it never touches groupsOf()/matchFilter(). */
+  function renderProjectsGrouped() {
+    if (typeof PROJECTS === "undefined") return;
+    [["#projOss", "oss"], ["#projOnline", "online"], ["#projInternal", "internal"]].forEach(([sel, src]) => {
+      const grid = $(sel);
+      if (!grid) return;
+      grid.innerHTML = PROJECTS.filter((p) => p.source === src).map((p, i) => pcardHTML(p, i, false)).join("");
+    });
   }
   function groupsOf(p) {
     if (p.groups && p.groups.length) return p.groups.join(" ");
@@ -369,6 +381,83 @@
         <p class="oss-row__desc">${r.desc}</p>
         <span class="oss-row__go">view on GitHub ↗</span>
       </a>`).join("");
+  }
+
+  /* ====================================================================
+     DOWNLOADS (home) — static rows first, real installer links after paint
+     ==================================================================== */
+  /* same one-liner as cv.js; the two files are separate IIFEs, nothing to share */
+  const firstSentence = (t) => (t.match(/^.*?\.(?=\s|$)/) || [t])[0];
+
+  /* electron-builder artifact conventions. .blockmap/.yml/checksums match nothing;
+     ScreenMCP's -Portable- exe and .deb are deliberately left out. */
+  const DL_PLATFORMS = [
+    { id: "windows", label: "Windows", match: /-setup-.*\.exe$/i },
+    { id: "macos", label: "macOS", note: "Apple Silicon", match: /\.dmg$/i },
+    { id: "linux", label: "Linux", match: /\.appimage$/i },
+  ];
+
+  function renderDownloads() {
+    const list = $("#downloadsList");
+    if (!list || typeof HOME === "undefined") return;
+    list.innerHTML = HOME.downloads.map((d, i) => {
+      const src = d.project
+        ? firstSentence((PROJECTS.find((p) => p.name === d.project) || { blurb: "" }).blurb)
+        : (OSS_REPOS.find((r) => r.repo === d.repo) || { desc: "" }).desc;
+      // release rows: one button per platform, href points at the releases page until
+      // upgradeDownloadLinks() swaps in the direct asset URL
+      const actions = d.release
+        ? DL_PLATFORMS.map((pl) => `
+          <a class="dl-btn" data-dl="${d.release.repo}:${pl.id}" href="https://github.com/${d.release.owner}/${d.release.repo}/releases/latest" target="_blank" rel="noopener">
+            <span class="dl-btn__plat">${pl.label}${pl.note ? `<em class="dl-btn__note">${pl.note}</em>` : ""}</span>
+            <span class="dl-btn__meta">latest release</span>
+          </a>`).join("")
+        : `<a class="dl-btn dl-btn--single" href="${d.url}" target="_blank" rel="noopener">
+            <span class="dl-btn__plat">Get it</span>
+            <span class="dl-btn__meta">${d.kind}</span>
+          </a>`;
+      return `
+      <article class="dl-row reveal" style="--d:${i * 45}ms">
+        <div class="dl-row__body">
+          <div class="dl-row__head">
+            <h3 class="dl-row__name">${d.name}</h3>
+            <span class="dl-row__kind">${d.kind}</span>
+          </div>
+          <p class="dl-row__desc">${src}</p>
+        </div>
+        <div class="dl-row__actions">${actions}</div>
+      </article>`;
+    }).join("");
+  }
+
+  /* Runs after first paint, never during boot. Failure keeps the releases-page
+     hrefs that are already in the DOM, so there is nothing to report. */
+  function upgradeDownloadLinks() {
+    if (typeof HOME === "undefined" || !$("#downloadsList")) return;
+    HOME.downloads.filter((d) => d.release).forEach((d) => {
+      fetch(`https://api.github.com/repos/${d.release.owner}/${d.release.repo}/releases/latest`)
+        .then((r) => (r.ok ? r.json() : Promise.reject()))
+        .then((rel) => {
+          DL_PLATFORMS.forEach((pl) => {
+            const asset = (rel.assets || []).find((a) => pl.match.test(a.name));
+            const btn = asset && $(`[data-dl="${d.release.repo}:${pl.id}"]`);
+            if (!btn) return;
+            btn.href = asset.browser_download_url;
+            btn.querySelector(".dl-btn__meta").textContent =
+              `${rel.tag_name} · ${Math.max(1, Math.round(asset.size / 1048576))} MB`;
+          });
+        })
+        .catch(() => {});
+    });
+  }
+
+  /* The dossier used to live at "/", so its section anchors are shared and
+     bookmarked. #contact is not remapped: home has its own contact panel. */
+  function redirectLegacyHash() {
+    if (document.body.dataset.page !== "home") return;
+    const legacy = ["work", "oss", "security", "system", "stack", "toolbox", "method", "journey", "looking"];
+    const h = location.hash.slice(1);
+    if (legacy.indexOf(h) !== -1) location.replace("cv.html#" + h);
   }
 
   function renderTimeline() {
@@ -544,6 +633,7 @@
 
   /* ---- boot ----------------------------------------------------------- */
   function boot() {
+    redirectLegacyHash();
     if (typeof MAP_PRODUCT !== "undefined") {
       renderMap($("#mapProduct"), MAP_PRODUCT);
       let mrt;
@@ -556,8 +646,12 @@
     renderWorkshift();
     renderProcess(); renderStack();
     renderFilters(); renderProjects(); renderOss(); renderTimeline();
+    renderDownloads(); renderProjectsGrouped();
     initFilters(); initReveal(); initNav(); initRotator(); initSmoothScroll();
     const y = $("#year"); if (y) y.textContent = new Date().getFullYear();
+    // installer links are a nice-to-have: fetch them once the page is on screen
+    if ("requestIdleCallback" in window) requestIdleCallback(upgradeDownloadLinks, { timeout: 4000 });
+    else setTimeout(upgradeDownloadLinks, 1500);
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
   else boot();

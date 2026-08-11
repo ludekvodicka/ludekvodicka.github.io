@@ -176,6 +176,26 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .topbar__gh { display: grid; place-items: center; width: 34px; height: 34px; color: var(--ink-dim); border: 1px solid transparent; }
 .topbar__gh:hover { color: var(--ink); border-color: var(--line-strong); }
 
+/* ---- tabs: the page level, above the section sub-menu ----
+   The right-hand group is pushed over by .topbar__side's own margin-left:auto,
+   so this row lays out correctly whether or not .tabnav is present. */
+.brand { margin-right: 0; }
+.tabnav {
+  display: flex; align-items: stretch; order: 2;
+  margin-left: 1.3rem;
+  border-left: 1px solid var(--line); padding-left: 1.3rem;
+}
+.tabnav a {
+  display: inline-flex; align-items: center; padding: 0 0.95rem;
+  font-family: var(--font-mono); font-size: 0.78rem; font-weight: 600;
+  letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-dim);
+  border-bottom: 2px solid transparent;
+}
+.tabnav a:hover { color: var(--ink); border-bottom-color: var(--line-strong); }
+.tabnav a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--accent); }
+.topbar__side { order: 3; }
+.topnav { order: 4; }
+
 /* =========================================================================
    SECTION PRIMITIVES
    ========================================================================= */
@@ -388,6 +408,46 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .oss-row:hover .oss-row__go, .oss-row:focus-visible .oss-row__go { opacity: 1; }
 .oss__foot { margin-top: 1.6rem; font-family: var(--font-mono); font-size: 0.8rem; }
 .oss__foot .ilink { display: inline-flex; align-items: center; gap: 0.35rem; }
+
+/* =========================================================================
+   DOWNLOADS — home strip; one row per tool, one button per platform
+   ========================================================================= */
+.dl-list { display: grid; gap: 1.1rem; }
+.dl-row {
+  display: grid; grid-template-columns: 1fr auto; gap: 1rem 1.8rem;
+  background: var(--card); border: 1px solid var(--line-strong); border-radius: 2px;
+  border-top: 3px solid var(--accent);
+  padding: 1.25rem 1.4rem 1.35rem;
+  align-items: center;
+}
+.dl-row__head { display: flex; align-items: baseline; gap: 0.6rem; flex-wrap: wrap; }
+.dl-row__name { font-family: var(--font-mono); font-size: 0.95rem; font-weight: 600; color: var(--ink); margin: 0; }
+.dl-row__kind {
+  font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.09em;
+  text-transform: uppercase; color: var(--ink-mute);
+  border: 1px solid var(--line); padding: 0.1rem 0.4rem;
+}
+.dl-row__desc { color: var(--ink-dim); font-size: 0.85rem; margin: 0.4rem 0 0; max-width: 62ch; }
+/* equal columns: swapping "latest release" for "v0.2.6 · 84 MB" must not resize a button */
+.dl-row__actions { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 0.5rem; }
+.dl-btn {
+  display: grid; align-content: center; gap: 0.15rem;
+  min-width: 8.4rem; padding: 0.6rem 0.85rem;
+  border: 1px solid var(--line-strong); border-radius: 2px;
+  transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease), border-color 0.2s;
+}
+.dl-btn:hover, .dl-btn:focus-visible {
+  border-color: var(--ink); transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0 rgba(25, 27, 31, 0.16);
+}
+.dl-btn__plat {
+  font-family: var(--font-mono); font-size: 0.78rem; font-weight: 600;
+  letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink);
+}
+/* the arch qualifier is never rewritten by the release fetch, unlike __meta */
+.dl-btn__note { display: block; font-style: normal; font-size: 0.58rem; letter-spacing: 0.06em; color: var(--ink-mute); text-transform: none; }
+.dl-btn__meta { font-family: var(--font-mono); font-size: 0.64rem; color: var(--ink-mute); }
+.dl-btn--single { min-width: 11rem; }
 
 /* =========================================================================
    SECURITY
@@ -666,6 +726,12 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 @media (max-width: 1200px) {
   .brand__doc { display: none; }
 }
+@media (max-width: 620px) {
+  /* brand mark, three tabs and the CTA still have to share one row */
+  .brand__name { display: none; }
+  .tabnav { margin-left: 0.8rem; padding-left: 0.8rem; }
+  .tabnav a { padding: 0 0.6rem; font-size: 0.72rem; }
+}
 @media (max-width: 1080px) {
   .work__grid { grid-template-columns: repeat(2, 1fr); }
   .security__grid, .looking__grid { grid-template-columns: repeat(2, 1fr); }
@@ -684,6 +750,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   .stack-row__era { padding-top: 0; }
 }
 @media (max-width: 760px) {
+  .dl-row { grid-template-columns: 1fr; align-items: start; }
   .section__head { grid-template-columns: 1fr; gap: 0.5rem; }
   .section__no { font-size: 2.1rem; }
   .archmap { height: 540px; }
