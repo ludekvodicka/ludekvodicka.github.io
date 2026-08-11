@@ -765,6 +765,9 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   .wordcloud__stage { height: 440px; }
 }
 @media (max-width: 600px) {
+  /* three fixed-width platform buttons do not fit a phone row: let them wrap */
+  .dl-row__actions { grid-auto-flow: row; grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr)); }
+  .dl-btn, .dl-btn--single { min-width: 0; }
   .work__grid, .security__grid, .looking__grid { grid-template-columns: 1fr; }
   .process { grid-template-columns: 1fr; }
   .process__step { border-left: 0; }
