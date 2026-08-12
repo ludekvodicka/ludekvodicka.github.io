@@ -667,6 +667,15 @@ const HOME = {
       alt: "Vifito Desktop driving an infrared device, with the session chart",
     },
     {
+      name: "LocalGate",
+      repo: "LocalGate",
+      kind: "Dev tool · CLI",
+      url: "https://github.com/ludekvodicka/LocalGate",
+      detail: "/apps/localgate.html",
+      img: "assets/img/apps/localgate.webp",
+      alt: "Two terminals: a dev server answering on its name, and localgate restart and status beside it",
+    },
+    {
       name: "vscode-tortoise-git",
       repo: "vscode-tortoise-git",
       kind: "VS Code extension",

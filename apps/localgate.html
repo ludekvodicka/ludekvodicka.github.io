@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LocalGate · stable names for your local dev servers · Ludek Vodicka</title>
+  <meta name="description" content="LocalGate gives every dev server on your machine a name instead of a port: one proxy on 80 routes by Host, so an app is myapp.localhost here and reachable under the same name from the LAN. Restart swaps the dev server without losing your terminal or debugger." />
+  <meta property="og:title" content="LocalGate · stable names for your local dev servers" />
+  <meta property="og:description" content="One reverse proxy on port 80 routes every dev server by Host header, so each app gets a name instead of a port. Restart keeps the terminal, the debugger and the route." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://ludekvodicka.github.io/apps/localgate.html" />
+  <meta property="og:image" content="https://ludekvodicka.github.io/assets/img/apps/localgate/og.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Two terminals: a dev server answering on its name, and localgate restart and status beside it" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="canonical" href="https://ludekvodicka.github.io/apps/localgate.html" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;1,400;1,500&display=swap" rel="stylesheet" />
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23f5f3ee'/%3E%3Crect x='7' y='7' width='86' height='86' fill='none' stroke='%23191b1f' stroke-width='6'/%3E%3Ctext x='50' y='68' font-family='monospace' font-size='44' font-weight='700' text-anchor='middle' fill='%23244297'%3ELV%3C/text%3E%3C/svg%3E" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "LocalGate",
+    "operatingSystem": "Windows",
+    "applicationCategory": "DeveloperApplication",
+    "url": "https://ludekvodicka.github.io/apps/localgate.html",
+    "downloadUrl": "https://github.com/ludekvodicka/LocalGate",
+    "license": "https://opensource.org/licenses/MIT",
+    "author": { "@type": "Person", "name": "Ludek Vodicka" }
+  }
+  </script>
+
+  <link rel="stylesheet" href="/assets/css/styles.css" />
+
+  <script async data-id="101509832" src="//static.getclicky.com/js"></script>
+</head>
+<body data-page="app">
+  <!-- SHARED SHELL: keep in sync across index.html / cv.html / apps/*.html.
+       Per-page differences: the tab carrying aria-current, the .topnav items,
+       the topbar CTA target, and body[data-page]. Everything else verbatim. -->
+  <noscript>
+    <div class="noscript">
+      <p><strong>This page renders its content with JavaScript</strong>, which is switched off in your
+      browser, so most of it is not visible. My work history and contact details are on
+      <a href="https://www.linkedin.com/in/ludekvodicka/">LinkedIn</a>, my code is on
+      <a href="https://github.com/ludekvodicka">GitHub</a>, and you can reach me at
+      <a href="mailto:ludek.vodicka@gmail.com">ludek.vodicka@gmail.com</a>.</p>
+    </div>
+  </noscript>
+  <a class="skiplink" href="#top">Skip to content</a>
+  <div class="progress" id="progress" aria-hidden="true"></div>
+
+  <!-- ===================== MASTHEAD / NAV ===================== -->
+  <header class="topbar" id="topbar">
+    <div class="topbar__inner">
+      <a href="/index.html" class="brand" aria-label="Home">
+        <span class="brand__mark">LV</span>
+        <span class="brand__name">Ludek Vodicka</span>
+        <span class="brand__doc">engineering dossier</span>
+      </a>
+      <nav class="tabnav" aria-label="Site">
+        <a href="/index.html">Home</a>
+        <a href="/cv.html">CV</a>
+      </nav>
+      <div class="topbar__side">
+        <a href="https://github.com/ludekvodicka" class="topbar__gh" target="_blank" rel="noopener" aria-label="GitHub (opens in a new tab)">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56 0-.28-.01-1.02-.02-2-3.19.7-3.87-1.54-3.87-1.54-.52-1.33-1.28-1.68-1.28-1.68-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.69 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.12 3.05.74.81 1.18 1.83 1.18 3.09 0 4.42-2.69 5.39-5.25 5.68.41.36.78 1.06.78 2.14 0 1.55-.01 2.8-.01 3.18 0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5z"/></svg>
+        </a>
+        <a href="/index.html#contact" class="btn btn--ink btn--sm topbar__cta">Get in touch</a>
+      </div>
+      <nav class="topnav" aria-label="Sections">
+        <a href="/index.html#apps">← All apps</a>
+        <a href="#overview"><i>01</i>Overview</a>
+        <a href="#download"><i>02</i>Download</a>
+      </nav>
+    </div>
+  </header>
+  <!-- END SHARED SHELL -->
+
+  <main id="top">
+    <section class="apphero">
+      <div class="sheet apphero__sheet">
+        <span class="sheet__corner sheet__corner--tl" aria-hidden="true"></span>
+        <span class="sheet__corner sheet__corner--tr" aria-hidden="true"></span>
+        <span class="sheet__corner sheet__corner--bl" aria-hidden="true"></span>
+        <span class="sheet__corner sheet__corner--br" aria-hidden="true"></span>
+        <figure class="apphero__media">
+          <img src="/assets/img/apps/localgate/hero.webp" width="1320" height="509"
+               alt="Two terminals: a dev server answering on its name, and localgate restart and status beside it"
+               fetchpriority="high" decoding="async" />
+          <figcaption class="figure__cap"><span class="figure__no">Fig. 01</span> A dev server on its name, restarted from another terminal</figcaption>
+        </figure>
+        <div class="apphero__body">
+          <p class="apphero__kind">Dev tool · CLI · Windows</p>
+          <h1 class="apphero__name">LocalGate</h1>
+          <p class="apphero__tagline">Every local dev server gets a name instead of a port.</p>
+          <div class="app-actions" data-app-actions="LocalGate">
+            <a class="dl-btn dl-btn--single" href="https://github.com/ludekvodicka/LocalGate" target="_blank" rel="noopener">
+              <span class="dl-btn__plat">Get it</span>
+              <span class="dl-btn__meta">GitHub repository</span>
+            </a>
+          </div>
+          <p class="apphero__meta">Free · Apache-2.0 · install from the repository</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="overview">
+      <header class="section__head">
+        <span class="section__no" aria-hidden="true">01</span>
+        <div class="section__headbody">
+          <p class="section__kicker">Overview</p>
+          <h2 class="section__title">Stop memorising <em>port numbers</em></h2>
+          <p class="section__sub">
+            Three projects open, three ports to remember, and a colleague who cannot see any of them. LocalGate replaces that with names.
+          </p>
+        </div>
+      </header>
+
+      <p>One reverse proxy listens on port 80 and routes by the Host header, so every dev server on the machine gets a name: myapp.localhost here, and optionally myapp under your own domain so someone else on the network can open the same thing. Each server binds an ephemeral loopback port and registers itself, so there is no config file listing apps, no port assignments to keep in sync, and nothing to clean up after a crash.</p>
+
+      <p>The other half is the part an editor cannot give you. LocalGate owns the dev server it starts, as a child of a runner that sits in your editor's debug terminal. That is what lets localgate restart swap the process underneath while the terminal, the debugger attachment and the route all stay exactly where they were, and the browser keeps its URL.</p>
+
+      <p>It also answers questions. localgate status --json says where and how an app is running, which is what a coding agent needs to know before it touches anything, and while a dev server is down the proxy serves a readable page instead of a connection error. Websocket upgrades are proxied, and Next.js hot reload works through a shared name without an allowedDevOrigins entry in the project.</p>
+
+      <div class="appfeat">
+        <article class="sec-card">
+          <h3>A name per app</h3>
+          <p>myapp.localhost instead of a port, and the same name from the LAN when you want it.</p>
+        </article>
+        <article class="sec-card">
+          <h3>Restart without losing the terminal</h3>
+          <p>The runner owns the dev server, so the process is swapped and the terminal, debugger and route stay.</p>
+        </article>
+        <article class="sec-card">
+          <h3>No config to keep in sync</h3>
+          <p>Servers bind an ephemeral port and register themselves. Nothing lists apps, nothing survives a crash.</p>
+        </article>
+        <article class="sec-card">
+          <h3>Readable when it is down</h3>
+          <p>The proxy answers with a page that says what is happening rather than refusing the connection.</p>
+        </article>
+        <article class="sec-card">
+          <h3>Machine-readable state</h3>
+          <p>status --json tells an agent where an app runs, and logs tails what it printed.</p>
+        </article>
+        <article class="sec-card">
+          <h3>Settles its own collisions</h3>
+          <p>Start it twice and it finds its predecessor, shows you what is running, and asks before taking the name.</p>
+        </article>
+      </div>
+
+      <p class="appfoot">Open source under Apache-2.0. Early, and Windows-only for now: the process-tree kill behind restart uses taskkill, and the port-80 bind assumes Windows. The rest is plain Node.</p>
+    </section>
+
+    <section class="section" id="download">
+      <header class="section__head">
+        <span class="section__no" aria-hidden="true">02</span>
+        <div class="section__headbody">
+          <p class="section__kicker">Download</p>
+          <h2 class="section__title">Get LocalGate</h2>
+          <p class="section__sub">
+            Not on npm yet, so it installs from the repository: clone it, run pnpm install, then pnpm link --global to put localgate on your PATH. Needs Windows and Node 24 or newer.
+          </p>
+        </div>
+      </header>
+      <div class="app-actions" data-app-actions="LocalGate">
+            <a class="dl-btn dl-btn--single" href="https://github.com/ludekvodicka/LocalGate" target="_blank" rel="noopener">
+              <span class="dl-btn__plat">Get it</span>
+              <span class="dl-btn__meta">GitHub repository</span>
+            </a>
+      </div>
+      <p class="appfoot"><a class="ilink" href="/index.html#apps">← All apps</a></p>
+    </section>
+  </main>
+
+  <!-- SHARED SHELL: footer -->
+  <footer class="footer">
+    <div class="footer__inner">
+      <span class="footer__mark">LV</span>
+      <p>© <span id="year"></span> Ludek Vodicka · <a href="https://github.com/ludekvodicka" class="ilink" target="_blank" rel="noopener">GitHub</a> · <a href="https://www.linkedin.com/in/ludekvodicka/" class="ilink" target="_blank" rel="noopener">LinkedIn</a></p>
+      <a href="#top" class="footer__top">Back to top ↑</a>
+    </div>
+  </footer>
+  <!-- END SHARED SHELL -->
+
+  <script defer src="/assets/js/data.js"></script>
+  <script defer src="/assets/js/main.js"></script>
+</body>
+</html>
