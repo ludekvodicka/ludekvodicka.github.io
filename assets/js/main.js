@@ -379,10 +379,12 @@
   /* same one-liner as cv.js; the two files are separate IIFEs, nothing to share */
   const firstSentence = (t) => (t.match(/^.*?\.(?=\s|$)/) || [t])[0];
 
-  /* electron-builder artifact conventions. .blockmap/.yml/checksums match nothing;
-     ScreenMCP's -Portable- exe and .deb are deliberately left out. */
+  /* electron-builder artifact conventions. Windows is "an .exe that is not portable":
+     the four repos name their installer either -Setup-*.exe or plain -x64.exe, and only
+     the portable builds must be skipped. .blockmap/.yml/.zip/.deb/.tar.gz/checksums
+     match nothing; .deb is left out so Linux stays one button. */
   const DL_PLATFORMS = [
-    { id: "windows", label: "Windows", match: /-setup-.*\.exe$/i },
+    { id: "windows", label: "Windows", match: /^(?!.*portable).*\.exe$/i },
     { id: "macos", label: "macOS", note: "Apple Silicon", match: /\.dmg$/i },
     { id: "linux", label: "Linux", match: /\.appimage$/i },
   ];

@@ -588,11 +588,12 @@ const OSS_REPOS = [
 
 const OSS_GH_USER = "ludekvodicka";
 
-/* ---- Home page - the things a visitor can install or clone today -------
+/* ---- Home page - the apps a visitor can install or clone today ---------
    Each row names exactly one of `project` (joins PROJECTS by name) or `repo`
    (joins OSS_REPOS by repo), so the description is never retyped here.
    `release` marks a repo that publishes GitHub releases: the row renders one
-   button per platform, and main.js upgrades them to direct asset URLs.       */
+   button per platform, and main.js upgrades them to direct asset URLs.
+   `img`/`alt` add a thumbnail; without them the row shows a `ph` tile.       */
 const HOME = {
   downloads: [
     {
@@ -616,22 +617,32 @@ const HOME = {
       release: { owner: "ludekvodicka", repo: "ScreenMCP" },
     },
     {
-      name: "Local Voice-to-Text",
-      project: "Local Voice-to-Text",
-      kind: "Python tool · clone",
-      url: "https://github.com/ludekvodicka/local-dictate",
+      name: "MeetingRecorder",
+      repo: "MeetingRecorder",
+      kind: "Desktop app · installers",
+      url: "https://github.com/ludekvodicka/MeetingRecorder/releases",
+      release: { owner: "ludekvodicka", repo: "MeetingRecorder" },
+    },
+    {
+      name: "Vifito Desktop",
+      repo: "VifitoDesktop",
+      kind: "Desktop app · installers",
+      url: "https://github.com/ludekvodicka/VifitoDesktop/releases",
+      release: { owner: "ludekvodicka", repo: "VifitoDesktop" },
     },
     {
       name: "vscode-tortoise-git",
       repo: "vscode-tortoise-git",
       kind: "VS Code extension",
       url: "https://github.com/ludekvodicka/vscode-tortoise-git",
+      ph: "GIT",
     },
     {
       name: "vscode-tortoise-svn",
       repo: "vscode-tortoise-svn",
       kind: "VS Code extension",
       url: "https://github.com/ludekvodicka/vscode-tortoise-svn",
+      ph: "SVN",
     },
   ],
 };
