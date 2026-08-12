@@ -238,6 +238,14 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   background: var(--card);
   padding: clamp(2.2rem, 6vw, 4.6rem) clamp(1.4rem, 5vw, 4.2rem);
 }
+/* home page: the same sheet, just not shouting - the display-scale hero is the CV's */
+.sheet--compact { padding: clamp(1.6rem, 4vw, 2.6rem) clamp(1.4rem, 5vw, 4.2rem); }
+.hero__title--compact {
+  font-size: clamp(1.6rem, 3.2vw, 2rem); font-weight: 700;
+  letter-spacing: -0.03em; margin: 0 0 0.9rem;
+}
+.sheet--compact .hero__eyebrow { margin-bottom: 1.3rem; }
+.sheet--compact .hero__lead { margin-bottom: 1.6rem; }
 .sheet__corner { position: absolute; width: 14px; height: 14px; border: 0 solid var(--ink); }
 .sheet__corner--tl { top: -1px; left: -1px; border-top-width: 3px; border-left-width: 3px; }
 .sheet__corner--tr { top: -1px; right: -1px; border-top-width: 3px; border-right-width: 3px; }
@@ -266,8 +274,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .hero__dot { color: var(--accent); }
 .hero__role { font-size: clamp(1.15rem, 2.8vw, 1.7rem); font-weight: 500; margin: 1.3rem 0 1.5rem; min-height: 1.5em; letter-spacing: -0.015em; }
 .hero__role-static { color: var(--ink-mute); font-weight: 400; }
-/* --fixed is the home page's version: same treatment, no typing, no caret */
-.hero__role-rotator, .hero__role-fixed {
+.hero__role-rotator {
   color: var(--ink); margin-left: 0.45rem;
   border-bottom: 2px solid var(--accent); padding: 0 2px 1px;
 }
