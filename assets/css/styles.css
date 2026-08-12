@@ -407,8 +407,8 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .oss-row__desc { grid-column: 1 / -1; color: var(--ink-dim); font-size: 0.85rem; margin: 0.15rem 0 0; max-width: 58ch; }
 .oss-row__go { grid-column: 1 / -1; font-family: var(--font-mono); font-size: 0.68rem; color: var(--accent-deep); opacity: 0; transition: opacity 0.2s; margin-top: 0.2rem; }
 .oss-row:hover .oss-row__go, .oss-row:focus-visible .oss-row__go { opacity: 1; }
-.oss__foot, .work__foot { margin-top: 1.6rem; font-family: var(--font-mono); font-size: 0.8rem; display: flex; flex-wrap: wrap; gap: 0.4rem 1.8rem; }
-.oss__foot .ilink, .work__foot .ilink { display: inline-flex; align-items: center; gap: 0.35rem; }
+.oss__foot { margin-top: 1.6rem; font-family: var(--font-mono); font-size: 0.8rem; }
+.oss__foot .ilink { display: inline-flex; align-items: center; gap: 0.35rem; }
 
 /* =========================================================================
    DOWNLOADS — home strip; one row per tool, one button per platform

@@ -325,16 +325,6 @@
     if (!grid || typeof PROJECTS === "undefined") return;
     grid.innerHTML = PROJECTS.map((p, i) => pcardHTML(p, i, tierOf(p) !== "top")).join("");
   }
-  /* projects.html - the full catalog, split by how the code is available.
-     `source` is a third axis: it never touches groupsOf()/matchFilter(). */
-  function renderProjectsGrouped() {
-    if (typeof PROJECTS === "undefined") return;
-    [["#projOss", "oss"], ["#projOnline", "online"], ["#projInternal", "internal"]].forEach(([sel, src]) => {
-      const grid = $(sel);
-      if (!grid) return;
-      grid.innerHTML = PROJECTS.filter((p) => p.source === src).map((p, i) => pcardHTML(p, i, false)).join("");
-    });
-  }
   function groupsOf(p) {
     if (p.groups && p.groups.length) return p.groups.join(" ");
     if (p.cat === "ai") return "ai coding";
@@ -646,7 +636,7 @@
     renderWorkshift();
     renderProcess(); renderStack();
     renderFilters(); renderProjects(); renderOss(); renderTimeline();
-    renderDownloads(); renderProjectsGrouped();
+    renderDownloads();
     initFilters(); initReveal(); initNav(); initRotator(); initSmoothScroll();
     const y = $("#year"); if (y) y.textContent = new Date().getFullYear();
     // installer links are a nice-to-have: fetch them once the page is on screen
