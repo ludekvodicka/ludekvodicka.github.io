@@ -422,6 +422,8 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
    ========================================================================= */
 .dl-list { display: grid; gap: 1.1rem; }
 .dl-row {
+  position: relative;
+  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
   display: grid; grid-template-columns: auto 1fr auto; gap: 1rem 1.8rem;
   background: var(--card); border: 1px solid var(--line-strong); border-radius: 2px;
   border-top: 3px solid var(--accent);
@@ -467,6 +469,78 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .dl-btn__note { display: block; font-style: normal; font-size: 0.58rem; letter-spacing: 0.06em; color: var(--ink-mute); text-transform: none; }
 .dl-btn__meta { font-family: var(--font-mono); font-size: 0.64rem; color: var(--ink-mute); }
 .dl-btn--single { min-width: 11rem; }
+
+/* The whole row links to the app's page. The title is the real anchor and its
+   ::after covers the row; the buttons are lifted above that overlay so they keep
+   working. Cost: dragging to select text inside the row no longer works. */
+.dl-row--link:hover, .dl-row--link:focus-within {
+  transform: translate(-2px, -2px); box-shadow: 5px 5px 0 rgba(25, 27, 31, 0.14);
+}
+.dl-row__link { color: inherit; }
+.dl-row--link:hover .dl-row__link { color: var(--accent-deep); }
+.dl-row__link::after { content: ""; position: absolute; inset: 0; }
+.dl-row__actions { position: relative; z-index: 1; }
+.pcard__stretch { color: inherit; }
+.pcard__stretch::after { content: ""; position: absolute; inset: 0; }
+.pcard--link:hover .pcard__stretch { color: var(--accent-deep); }
+.pcard__links { position: relative; z-index: 1; }
+/* says where the click goes, before hover */
+.dl-row__go, .pcard__go {
+  display: inline-block; margin-top: 0.5rem;
+  font-family: var(--font-mono); font-size: 0.68rem; font-weight: 600;
+  color: var(--accent-deep);
+}
+.dl-row--link:hover .dl-row__go, .pcard--link:hover .pcard__go { color: var(--accent); }
+
+/* =========================================================================
+   APP DETAIL PAGES — hero, shot gallery, spec panel
+   ========================================================================= */
+.apphero { max-width: var(--maxw); margin: 0 auto; padding: clamp(2rem, 5vw, 3.6rem) 1.5rem 0; }
+.apphero__sheet {
+  display: grid; grid-template-columns: 3fr 2fr; gap: clamp(1.4rem, 3vw, 2.6rem);
+  align-items: center; padding: clamp(1.6rem, 4vw, 2.6rem);
+}
+.apphero__media { margin: 0; }
+.apphero__media img { display: block; width: 100%; height: auto; border: 1px solid var(--line-strong); }
+.apphero__kind {
+  font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.09em;
+  text-transform: uppercase; color: var(--ink-mute); margin: 0;
+}
+.apphero__name { font-size: clamp(2rem, 4.5vw, 3rem); letter-spacing: -0.03em; margin: 0.3rem 0 0.7rem; }
+.apphero__tagline { font-family: var(--font-serif); font-size: 1.08rem; color: var(--ink-dim); margin: 0; }
+.app-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1.3rem 0 0.9rem; }
+.apphero__meta { font-family: var(--font-mono); font-size: 0.72rem; color: var(--ink-mute); margin: 0; }
+.appshots__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.6rem; align-items: start; }
+.appshots__grid figure { margin: 0; }
+.appshots__grid img { display: block; width: 100%; height: auto; border: 1px solid var(--line-strong); }
+.appfeat { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.1rem; margin-top: 1.8rem; }
+.appfoot { margin-top: 1.8rem; font-family: var(--font-mono); font-size: 0.8rem; }
+
+/* the two VS Code extensions have no screenshot: the hero slot carries their
+   command surface as type instead, on the same mm-grid texture as the diagrams */
+.specpanel {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 0.8rem; min-height: 340px; padding: 2rem;
+  border: 1px solid var(--line-strong);
+  background:
+    linear-gradient(rgba(25, 27, 31, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(25, 27, 31, 0.045) 1px, transparent 1px),
+    var(--card);
+  background-size: 28px 28px, 28px 28px, auto;
+}
+.specpanel__mark {
+  font-family: var(--font-mono); font-weight: 600; letter-spacing: 0.14em;
+  font-size: clamp(2.6rem, 6vw, 4.2rem); color: var(--ink); line-height: 1;
+}
+.specpanel__sub {
+  font-family: var(--font-mono); font-size: 0.74rem; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--ink-mute);
+}
+.specpanel__list { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.35rem; max-width: 34ch; }
+.specpanel__list li {
+  font-family: var(--font-mono); font-size: 0.7rem; color: var(--ink-dim);
+  padding: 0.22rem 0.55rem; border: 1px solid var(--line); background: var(--paper);
+}
 
 /* =========================================================================
    SECURITY
@@ -751,6 +825,9 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   .tabnav { margin-left: 0.8rem; padding-left: 0.8rem; }
   .tabnav a { padding: 0 0.6rem; font-size: 0.72rem; }
 }
+@media (max-width: 900px) {
+  .apphero__sheet { grid-template-columns: 1fr; }
+}
 @media (max-width: 1080px) {
   .work__grid { grid-template-columns: repeat(2, 1fr); }
   .security__grid, .looking__grid { grid-template-columns: repeat(2, 1fr); }
@@ -771,6 +848,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 @media (max-width: 760px) {
   .dl-row { grid-template-columns: 1fr; align-items: start; }
   .dl-thumb { display: none; }   /* phone rows stay text-first; the images never load */
+  .appshots__grid, .appfeat { grid-template-columns: 1fr; }
   .section__head { grid-template-columns: 1fr; gap: 0.5rem; }
   .section__no { font-size: 2.1rem; }
   .archmap { height: 540px; }

@@ -305,19 +305,28 @@
       return `<button type="button" class="chip-filter${on ? " is-active" : ""}" data-filter="${f.id}" aria-pressed="${on}">${f.label}</button>`;
     }).join("");
   }
+  /* the two link arrows: outward for another site, straight for a page of ours */
+  const EXT_ARROW = `<svg viewBox="0 0 24 24" width="11" height="11" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  const INT_ARROW = `<svg viewBox="0 0 24 24" width="11" height="11" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
   /* one card, one markup - shared by the dossier grid and the grouped catalog */
   function pcardHTML(p, i, hidden) {
     const tier = tierOf(p);
+    const ext = p.detail && /^https?:/i.test(p.detail);
+    const nameHtml = p.detail
+      ? `<a class="pcard__stretch" href="${p.detail}"${ext ? ` target="_blank" rel="noopener"` : ""}>${p.name}</a>`
+      : p.name;
     return `
-      <article class="pcard pcard--${p.cat} tier-${tier} reveal${hidden ? " is-hidden" : ""}" data-cat="${p.cat}" data-tier="${tier}" data-groups="${groupsOf(p)}" style="--d:${(i % 6) * 55}ms">
+      <article class="pcard pcard--${p.cat} tier-${tier} reveal${hidden ? " is-hidden" : ""}${p.detail ? " pcard--link" : ""}" data-cat="${p.cat}" data-tier="${tier}" data-groups="${groupsOf(p)}" style="--d:${(i % 6) * 55}ms">
         <div class="pcard__top"><span class="pcard__cat">${catLabel(p.cat)}</span>${p.metric ? `<span class="pcard__metric">${p.metric}</span>` : ""}</div>
         ${tier === "top" ? `<span class="pcard__tier">★ top-tier</span>` : ""}
         ${p.flag ? `<span class="pcard__flag">${p.flag}</span>` : ""}
-        <h3 class="pcard__name">${p.name}</h3>
+        <h3 class="pcard__name">${nameHtml}</h3>
         <p class="pcard__blurb">${p.blurb}</p>
         ${p.highlight ? `<p class="pcard__highlight">▹ ${p.highlight}</p>` : ""}
         <ul class="pcard__tech">${p.tech.map((t) => `<li>${t}</li>`).join("")}</ul>
-        ${(p.links && p.links.length) ? `<div class="pcard__links">${p.links.map((l) => `<a href="${l.url}" class="pcard__link" target="_blank" rel="noopener">${l.label}<svg viewBox="0 0 24 24" width="11" height="11" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>`).join("")}</div>` : ""}
+        ${(p.links && p.links.length) ? `<div class="pcard__links">${p.links.map((l) => { const lext = /^https?:/i.test(l.url); return `<a href="${l.url}" class="pcard__link"${lext ? ` target="_blank" rel="noopener"` : ""}>${l.label}${lext ? EXT_ARROW : INT_ARROW}</a>`; }).join("")}</div>` : ""}
+        ${p.detail ? `<span class="pcard__go">${ext ? `${extHost(p.detail)} ↗` : "app page →"}</span>` : ""}
       </article>`;
   }
   function renderProjects() {
@@ -389,6 +398,24 @@
     { id: "linux", label: "Linux", match: /\.appimage$/i },
   ];
 
+  const extHost = (url) => new URL(url).hostname.replace(/^www\./, "");
+
+  /* release rows: one button per platform, href points at the releases page until
+     upgradeDownloadLinks() swaps in the direct asset URL. Shared by the home strip
+     and the detail pages so the two can never drift apart. */
+  function dlButtonsHTML(d) {
+    return d.release
+      ? DL_PLATFORMS.map((pl) => `
+          <a class="dl-btn" data-dl="${d.release.repo}:${pl.id}" href="https://github.com/${d.release.owner}/${d.release.repo}/releases/latest" target="_blank" rel="noopener">
+            <span class="dl-btn__plat">${pl.label}${pl.note ? `<em class="dl-btn__note">${pl.note}</em>` : ""}</span>
+            <span class="dl-btn__meta">latest release</span>
+          </a>`).join("")
+      : `<a class="dl-btn dl-btn--single" href="${d.url}" target="_blank" rel="noopener">
+            <span class="dl-btn__plat">Get it</span>
+            <span class="dl-btn__meta">${d.kind}</span>
+          </a>`;
+  }
+
   function renderDownloads() {
     const list = $("#downloadsList");
     if (!list || typeof HOME === "undefined") return;
@@ -396,56 +423,84 @@
       const src = d.project
         ? firstSentence((PROJECTS.find((p) => p.name === d.project) || { blurb: "" }).blurb)
         : (OSS_REPOS.find((r) => r.repo === d.repo) || { desc: "" }).desc;
-      // release rows: one button per platform, href points at the releases page until
-      // upgradeDownloadLinks() swaps in the direct asset URL
-      const actions = d.release
-        ? DL_PLATFORMS.map((pl) => `
-          <a class="dl-btn" data-dl="${d.release.repo}:${pl.id}" href="https://github.com/${d.release.owner}/${d.release.repo}/releases/latest" target="_blank" rel="noopener">
-            <span class="dl-btn__plat">${pl.label}${pl.note ? `<em class="dl-btn__note">${pl.note}</em>` : ""}</span>
-            <span class="dl-btn__meta">latest release</span>
-          </a>`).join("")
-        : `<a class="dl-btn dl-btn--single" href="${d.url}" target="_blank" rel="noopener">
-            <span class="dl-btn__plat">Get it</span>
-            <span class="dl-btn__meta">${d.kind}</span>
-          </a>`;
+      const actions = dlButtonsHTML(d);
       // one 160x100 box either way, so the left edge of the list never staggers
       const media = d.img
         ? `<img class="dl-thumb" src="${d.img}" alt="${d.alt}" width="160" height="100" loading="lazy" decoding="async" />`
         : `<span class="dl-thumb dl-thumb--ph" aria-hidden="true">${d.ph || d.name[0].toUpperCase()}</span>`;
+      // the whole row is a link to the app's page; the buttons sit above the overlay
+      const ext = d.detail && /^https?:/i.test(d.detail);
+      const nameHtml = d.detail
+        ? `<a class="dl-row__link" href="${d.detail}"${ext ? ` target="_blank" rel="noopener"` : ""}>${d.name}</a>`
+        : d.name;
+      const goHtml = d.detail
+        ? `<span class="dl-row__go">${ext ? `${extHost(d.detail)} ↗` : "app page →"}</span>`
+        : "";
       return `
-      <article class="dl-row reveal" style="--d:${i * 45}ms">
+      <article class="dl-row${d.detail ? " dl-row--link" : ""} reveal" style="--d:${i * 45}ms">
         ${media}
         <div class="dl-row__body">
           <div class="dl-row__head">
-            <h3 class="dl-row__name">${d.name}</h3>
+            <h3 class="dl-row__name">${nameHtml}</h3>
             <span class="dl-row__kind">${d.kind}</span>
           </div>
           <p class="dl-row__desc">${src}</p>
+          ${goHtml}
         </div>
         <div class="dl-row__actions">${actions}</div>
       </article>`;
     }).join("");
   }
 
+  /* Fills every [data-app-actions="<row name>"] mount on a detail page with the
+     same buttons the strip shows, plus a source link. Replaces the static anchor
+     each mount ships, which is what a visitor without JS keeps. */
+  function renderAppActions() {
+    const mounts = $$("[data-app-actions]");
+    if (!mounts.length || typeof HOME === "undefined") return;
+    mounts.forEach((m) => {
+      const d = HOME.downloads.find((x) => x.name === m.dataset.appActions);
+      if (!d) return;
+      let html = "";
+      if (d.store)
+        html += `<a class="dl-btn dl-btn--single" href="${d.store.url}" target="_blank" rel="noopener">
+            <span class="dl-btn__plat">Install</span>
+            <span class="dl-btn__meta">${d.store.label}</span>
+          </a>`;
+      html += dlButtonsHTML(d);
+      if (d.release)
+        html += `<a class="dl-btn dl-btn--single" href="https://github.com/${d.release.owner}/${d.release.repo}" target="_blank" rel="noopener">
+            <span class="dl-btn__plat">Source</span>
+            <span class="dl-btn__meta">GitHub repository</span>
+          </a>`;
+      m.innerHTML = html;
+    });
+  }
+
   /* Runs after first paint, never during boot. Failure keeps the releases-page
      hrefs that are already in the DOM, so there is nothing to report. */
   function upgradeDownloadLinks() {
-    if (typeof HOME === "undefined" || !$("#downloadsList")) return;
-    HOME.downloads.filter((d) => d.release).forEach((d) => {
-      fetch(`https://api.github.com/repos/${d.release.owner}/${d.release.repo}/releases/latest`)
-        .then((r) => (r.ok ? r.json() : Promise.reject()))
-        .then((rel) => {
-          DL_PLATFORMS.forEach((pl) => {
-            const asset = (rel.assets || []).find((a) => pl.match.test(a.name));
-            const btn = asset && $(`[data-dl="${d.release.repo}:${pl.id}"]`);
-            if (!btn) return;
-            btn.href = asset.browser_download_url;
-            btn.querySelector(".dl-btn__meta").textContent =
-              `${rel.tag_name} · ${Math.max(1, Math.round(asset.size / 1048576))} MB`;
-          });
-        })
-        .catch(() => {});
-    });
+    if (typeof HOME === "undefined" || !$("[data-dl]")) return;
+    HOME.downloads
+      // only the repos whose buttons are on THIS page: a detail page costs one call
+      .filter((d) => d.release && $(`[data-dl^="${d.release.repo}:"]`))
+      .forEach((d) => {
+        fetch(`https://api.github.com/repos/${d.release.owner}/${d.release.repo}/releases/latest`)
+          .then((r) => (r.ok ? r.json() : Promise.reject()))
+          .then((rel) => {
+            DL_PLATFORMS.forEach((pl) => {
+              const asset = (rel.assets || []).find((a) => pl.match.test(a.name));
+              if (!asset) return;
+              // a detail page mounts the same key twice, hero and bottom CTA
+              $$(`[data-dl="${d.release.repo}:${pl.id}"]`).forEach((btn) => {
+                btn.href = asset.browser_download_url;
+                btn.querySelector(".dl-btn__meta").textContent =
+                  `${rel.tag_name} · ${Math.max(1, Math.round(asset.size / 1048576))} MB`;
+              });
+            });
+          })
+          .catch(() => {});
+      });
   }
 
   /* The dossier used to live at "/", so its section anchors are shared and
@@ -643,7 +698,7 @@
     renderWorkshift();
     renderProcess(); renderStack();
     renderFilters(); renderProjects(); renderOss(); renderTimeline();
-    renderDownloads();
+    renderDownloads(); renderAppActions();
     initFilters(); initReveal(); initNav(); initRotator(); initSmoothScroll();
     const y = $("#year"); if (y) y.textContent = new Date().getFullYear();
     // installer links are a nice-to-have: fetch them once the page is on screen
