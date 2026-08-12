@@ -422,11 +422,22 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
    ========================================================================= */
 .dl-list { display: grid; gap: 1.1rem; }
 .dl-row {
-  display: grid; grid-template-columns: 1fr auto; gap: 1rem 1.8rem;
+  display: grid; grid-template-columns: auto 1fr auto; gap: 1rem 1.8rem;
   background: var(--card); border: 1px solid var(--line-strong); border-radius: 2px;
   border-top: 3px solid var(--accent);
   padding: 1.25rem 1.4rem 1.35rem;
   align-items: center;
+}
+.dl-thumb {
+  display: block; width: 160px; height: 100px; object-fit: cover;
+  border: 1px solid var(--line-strong); border-radius: 2px;
+}
+/* rows without a screenshot get the same box as a typographic tile */
+.dl-thumb--ph {
+  display: flex; align-items: center; justify-content: center;
+  background: var(--paper-2);
+  font-family: var(--font-mono); font-weight: 600; font-size: 1rem;
+  letter-spacing: 0.1em; color: var(--ink-mute);
 }
 .dl-row__head { display: flex; align-items: baseline; gap: 0.6rem; flex-wrap: wrap; }
 .dl-row__name { font-family: var(--font-mono); font-size: 0.95rem; font-weight: 600; color: var(--ink); margin: 0; }
@@ -759,6 +770,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 }
 @media (max-width: 760px) {
   .dl-row { grid-template-columns: 1fr; align-items: start; }
+  .dl-thumb { display: none; }   /* phone rows stay text-first; the images never load */
   .section__head { grid-template-columns: 1fr; gap: 0.5rem; }
   .section__no { font-size: 2.1rem; }
   .archmap { height: 540px; }

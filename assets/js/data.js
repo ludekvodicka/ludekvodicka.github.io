@@ -602,12 +602,16 @@ const HOME = {
       kind: "Desktop app · installers",
       url: "https://github.com/ludekvodicka/jamat/releases",
       release: { owner: "ludekvodicka", repo: "jamat" },
+      img: "assets/img/apps/jamat.webp",
+      alt: "Jamat's tiling workspace with several agent sessions side by side",
     },
     {
       name: "Skipper",
       project: "Skipper",
       kind: "Free trial",
       url: "https://skipper18.com/",
+      img: "assets/img/apps/skipper.webp",
+      alt: "Skipper's visual ORM editor with an entity diagram open",
     },
     {
       name: "ScreenMCP",
@@ -615,6 +619,8 @@ const HOME = {
       kind: "MCP server · installers",
       url: "https://github.com/ludekvodicka/ScreenMCP/releases",
       release: { owner: "ludekvodicka", repo: "ScreenMCP" },
+      img: "assets/img/apps/screenmcp.webp",
+      alt: "ScreenMCP showing a live preview of the shared screen region",
     },
     {
       name: "MeetingRecorder",
@@ -622,6 +628,8 @@ const HOME = {
       kind: "Desktop app · installers",
       url: "https://github.com/ludekvodicka/MeetingRecorder/releases",
       release: { owner: "ludekvodicka", repo: "MeetingRecorder" },
+      img: "assets/img/apps/meetingrecorder.webp",
+      alt: "MeetingRecorder capturing a meeting with its transcript panel",
     },
     {
       name: "Vifito Desktop",
@@ -629,6 +637,8 @@ const HOME = {
       kind: "Desktop app · installers",
       url: "https://github.com/ludekvodicka/VifitoDesktop/releases",
       release: { owner: "ludekvodicka", repo: "VifitoDesktop" },
+      img: "assets/img/apps/vifito-desktop.webp",
+      alt: "Vifito Desktop driving an infrared device, with the session chart",
     },
     {
       name: "vscode-tortoise-git",

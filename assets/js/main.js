@@ -408,8 +408,13 @@
             <span class="dl-btn__plat">Get it</span>
             <span class="dl-btn__meta">${d.kind}</span>
           </a>`;
+      // one 160x100 box either way, so the left edge of the list never staggers
+      const media = d.img
+        ? `<img class="dl-thumb" src="${d.img}" alt="${d.alt}" width="160" height="100" loading="lazy" decoding="async" />`
+        : `<span class="dl-thumb dl-thumb--ph" aria-hidden="true">${d.ph || d.name[0].toUpperCase()}</span>`;
       return `
       <article class="dl-row reveal" style="--d:${i * 45}ms">
+        ${media}
         <div class="dl-row__body">
           <div class="dl-row__head">
             <h3 class="dl-row__name">${d.name}</h3>
