@@ -274,6 +274,17 @@ const PROJECTS = [
     tech: ["Claude Agent SDK", "MCP servers", "Multi-agent", "Parallel fan-out", "TypeScript"],
     highlight: "Every agent's output goes through my review",
   },  {
+    name: "LocalGate",
+    cat: "tools",
+    flag: "Open source · Apache-2.0",
+    metric: "Names, not ports",
+    blurb:
+      "A reverse proxy that gives every local dev server a stable name instead of a port: one listener on 80 multiplexes the whole machine by Host header, so an app is myapp.localhost here and reachable under the same name from the LAN. It also owns the process it starts, which is the part an editor cannot do: restart swaps the dev server underneath without losing the terminal, the debugger or the route, and a JSON status tells a coding agent where an app is running before it touches anything.",
+    tech: ["TypeScript", "Node 24", "Reverse proxy", "CLI", "Websockets", "pnpm workspace"],
+    highlight: "One port 80 for every app · restart keeps the terminal and the debugger",
+    links: [{ label: "github.com/ludekvodicka/LocalGate", url: "https://github.com/ludekvodicka/LocalGate" }],
+  },
+  {
     name: "SvnTea",
     cat: "tools",
     flag: "Internal platform · not public yet",
@@ -551,6 +562,13 @@ const OSS_REPOS = [
     lang: "TypeScript",
     tag: "MCP server",
     desc: "Human-controlled desktop vision for AI agents: you pick the monitor, window or region. Localhost-only, bearer auth, redaction masks, audit trail.",
+  },
+  {
+    repo: "LocalGate",
+    name: "LocalGate",
+    lang: "TypeScript",
+    tag: "dev tool",
+    desc: "Stable names for local dev servers: one proxy on port 80 routes every app by Host, and restart swaps the dev server without losing your terminal or debugger.",
   },
   {
     repo: "MeetingRecorder",
