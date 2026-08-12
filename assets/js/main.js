@@ -542,7 +542,10 @@
           obs.unobserve(en.target);
         }
       });
-    }, { threshold: 0.14, rootMargin: "0px 0px -8% 0px" });
+      // Fire before the element reaches the viewport, not after. Waiting until it
+      // was 14% inside meant a long list ended in blank space while you scrolled,
+      // which reads as "that was the last one" rather than "more is coming".
+    }, { threshold: 0, rootMargin: "0px 0px 25% 0px" });
     els.forEach((e) => io.observe(e));
   }
   function animateCounter(el) {
