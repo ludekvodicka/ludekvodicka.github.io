@@ -255,6 +255,7 @@ const PROJECTS = [
   {
     name: "Skipper",
     cat: "desktop",
+    detail: "https://www.skipper18.com/",
     flag: "Flagship · 12+ years",
     metric: "$1M+ revenue",
     blurb:
@@ -285,6 +286,7 @@ const PROJECTS = [
   {
     name: "ScreenMCP",
     cat: "ai",
+    detail: "/apps/screenmcp.html",
     flag: "Open source · MIT",
     metric: "Human-gated desktop vision",
     blurb:
@@ -324,8 +326,8 @@ const PROJECTS = [
     tech: ["VS Code API", "TypeScript", "WinAPI", "Registry detection"],
     highlight: "Windows-native source control inside VS Code",
     links: [
-      { label: "TortoiseGit", url: "https://github.com/ludekvodicka/vscode-tortoise-git" },
-      { label: "TortoiseSVN", url: "https://github.com/ludekvodicka/vscode-tortoise-svn" },
+      { label: "TortoiseGit", url: "/apps/vscode-tortoise-git.html" },
+      { label: "TortoiseSVN", url: "/apps/vscode-tortoise-svn.html" },
     ],
   },
 
@@ -363,6 +365,7 @@ const PROJECTS = [
   {
     name: "Jamat",
     cat: "ai",
+    detail: "/apps/jamat.html",
     flag: "Open source · MIT",
     metric: "Multi-agent terminal",
     blurb:
@@ -601,6 +604,7 @@ const HOME = {
       project: "Jamat",
       kind: "Desktop app · installers",
       url: "https://github.com/ludekvodicka/jamat/releases",
+      detail: "/apps/jamat.html",
       release: { owner: "ludekvodicka", repo: "jamat" },
       img: "assets/img/apps/jamat.webp",
       alt: "Jamat's tiling workspace with several agent sessions side by side",
@@ -610,6 +614,7 @@ const HOME = {
       project: "Skipper",
       kind: "Free trial",
       url: "https://skipper18.com/",
+      detail: "https://www.skipper18.com/",
       img: "assets/img/apps/skipper.webp",
       alt: "Skipper's visual ORM editor with an entity diagram open",
     },
@@ -618,6 +623,7 @@ const HOME = {
       project: "ScreenMCP",
       kind: "MCP server · installers",
       url: "https://github.com/ludekvodicka/ScreenMCP/releases",
+      detail: "/apps/screenmcp.html",
       release: { owner: "ludekvodicka", repo: "ScreenMCP" },
       img: "assets/img/apps/screenmcp.webp",
       alt: "ScreenMCP showing a live preview of the shared screen region",
@@ -627,6 +633,7 @@ const HOME = {
       repo: "MeetingRecorder",
       kind: "Desktop app · installers",
       url: "https://github.com/ludekvodicka/MeetingRecorder/releases",
+      detail: "/apps/meetingrecorder.html",
       release: { owner: "ludekvodicka", repo: "MeetingRecorder" },
       img: "assets/img/apps/meetingrecorder.webp",
       alt: "MeetingRecorder capturing a meeting with its transcript panel",
@@ -636,6 +643,7 @@ const HOME = {
       repo: "VifitoDesktop",
       kind: "Desktop app · installers",
       url: "https://github.com/ludekvodicka/VifitoDesktop/releases",
+      detail: "/apps/vifito-desktop.html",
       release: { owner: "ludekvodicka", repo: "VifitoDesktop" },
       img: "assets/img/apps/vifito-desktop.webp",
       alt: "Vifito Desktop driving an infrared device, with the session chart",
@@ -645,13 +653,15 @@ const HOME = {
       repo: "vscode-tortoise-git",
       kind: "VS Code extension",
       url: "https://github.com/ludekvodicka/vscode-tortoise-git",
+      detail: "/apps/vscode-tortoise-git.html",
       ph: "GIT",
     },
     {
       name: "vscode-tortoise-svn",
       repo: "vscode-tortoise-svn",
       kind: "VS Code extension",
-      url: "https://github.com/ludekvodicka/vscode-tortoise-svn",
+      url: "https://github.com/ludekvodicka/vscode-tortoise-svn/releases",
+      detail: "/apps/vscode-tortoise-svn.html",
       ph: "SVN",
     },
   ],
