@@ -493,7 +493,7 @@
         <code class="lib-card__install">${r.install}</code>
         <div class="lib-card__foot">
           <a class="lib-card__link" href="https://www.npmjs.com/package/${r.npm}" target="_blank" rel="noopener">on npm ↗</a>
-          <a class="lib-card__link" href="https://github.com/${OSS_GH_USER}/${r.repo}" target="_blank" rel="noopener">source ↗</a>
+          <a class="lib-card__link" href="https://github.com/${OSS_GH_USER}/${r.repo}" target="_blank" rel="noopener">on GitHub ↗</a>
           <span class="lib-card__lic">${r.license}</span>
         </div>
       </article>`).join("");
