@@ -33,7 +33,8 @@
     "address": { "@type": "PostalAddress", "addressCountry": "CZ" },
     "sameAs": [
       "https://github.com/ludekvodicka",
-      "https://www.linkedin.com/in/ludekvodicka/"
+      "https://www.linkedin.com/in/ludekvodicka/",
+      "https://www.npmjs.com/~ludek.vodicka"
     ],
     "knowsAbout": ["TypeScript", "Solidity", "Web3", "Next.js", "Node.js", "C++", "Qt"]
   }
@@ -79,7 +80,9 @@
       </div>
       <nav class="topnav" aria-label="Sections">
         <a href="#apps"><i>01</i>My apps</a>
-        <a href="#contact"><i>02</i>Contact</a>
+        <a href="#tools"><i>02</i>Tools</a>
+        <a href="#libs"><i>03</i>Libraries</a>
+        <a href="#contact"><i>04</i>Contact</a>
       </nav>
     </div>
   </header>
@@ -101,7 +104,8 @@
         <p class="hero__lead">
           Welcome to my personal page. I'm a senior full-stack engineer, 25 years of shipping
           production systems, lately with an AI toolchain I built myself. The full dossier is one
-          tab over in the CV; below are the apps I've built that you can install right now.
+          tab over in the CV; below are the apps, tools and libraries I've built that you can
+          install right now.
         </p>
         <div class="hero__cta">
           <a href="cv.html" class="btn btn--accent">Read the full CV
@@ -127,10 +131,48 @@
       <div class="dl-list" id="downloadsList"><!-- injected --></div>
     </section>
 
+    <!-- ===================== TOOLS ===================== -->
+    <section class="section downloads" id="tools">
+      <header class="section__head reveal">
+        <span class="section__no" aria-hidden="true">02</span>
+        <div class="section__headbody">
+          <p class="section__kicker">Dev tools</p>
+          <h2 class="section__title">The tools I've <em>built</em></h2>
+          <p class="section__sub">
+            Smaller than an app and used every day: TortoiseGit and TortoiseSVN brought inside
+            VS Code, and a proxy that gives every local dev server a stable name.
+          </p>
+        </div>
+      </header>
+      <div class="dl-list" id="toolsList"><!-- injected --></div>
+    </section>
+
+    <!-- ===================== LIBRARIES ===================== -->
+    <section class="section libs" id="libs">
+      <header class="section__head reveal">
+        <span class="section__no" aria-hidden="true">03</span>
+        <div class="section__headbody">
+          <p class="section__kicker">Libraries</p>
+          <h2 class="section__title">The libraries I've <em>published</em></h2>
+          <p class="section__sub">
+            Packages you can install today. There are no screenshots here and there never will be:
+            the README is the interface.
+          </p>
+        </div>
+      </header>
+      <div class="lib-list" id="libsList"><!-- injected --></div>
+      <p class="oss__foot reveal">
+        <a href="https://www.npmjs.com/~ludek.vodicka" target="_blank" rel="noopener" class="ilink">
+          All packages on npm
+          <svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </p>
+    </section>
+
     <!-- ===================== CONTACT ===================== -->
     <section class="section contact" id="contact">
       <div class="contact__panel reveal">
-        <p class="contact__kicker">02 · Contact</p>
+        <p class="contact__kicker">04 · Contact</p>
         <h2 class="contact__title">Hiring for something <em>hard</em>?</h2>
         <p class="contact__sub">Got a contract that needs an engineer who can own it end to end, AI swarm included? Tell me what it is and I will tell you straight whether I can take it.</p>
         <div class="contact__actions">

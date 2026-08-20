@@ -417,6 +417,54 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .oss__foot { margin-top: 1.6rem; font-family: var(--font-mono); font-size: 0.8rem; }
 .oss__foot .ilink { display: inline-flex; align-items: center; gap: 0.35rem; }
 
+/* The compact second tier: one line per repo, so the section stays short as
+   the shelf grows. No collapsing — hiding evidence defeats the section. */
+.oss__subhead {
+  font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--ink-mute); font-weight: 500;
+  margin: 2.2rem 0 0;
+}
+.oss-idx { display: grid; grid-template-columns: 1fr 1fr; gap: 0 1.6rem; margin-top: 0.4rem; }
+.oss-idx__row {
+  display: grid; grid-template-columns: auto auto 1fr auto; align-items: baseline; gap: 0.55rem;
+  padding: 0.5rem 0; border-top: 1px solid var(--line); color: inherit; min-width: 0;
+}
+.oss-idx__row:hover .oss-idx__name { color: var(--accent-deep); }
+.oss-idx__name { font-family: var(--font-mono); font-size: 0.78rem; font-weight: 600; color: var(--ink); }
+.oss-idx__tag { font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-mute); }
+.oss-idx__desc { color: var(--ink-dim); font-size: 0.76rem; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.oss-idx__lang i { display: inline-block; width: 7px; height: 7px; border-radius: 50%; }
+
+/* =========================================================================
+   LIBRARIES (home) — npm packages: two columns, no images, ever
+   ========================================================================= */
+.lib-list { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; }
+.lib-card {
+  display: flex; flex-direction: column;
+  background: var(--card); border: 1px solid var(--line-strong); border-radius: 2px;
+  border-top: 3px solid var(--accent);
+  padding: 1.25rem 1.4rem 1.2rem;
+}
+.lib-card__head { display: flex; align-items: baseline; gap: 0.6rem; flex-wrap: wrap; }
+.lib-card__name { font-family: var(--font-mono); font-size: 0.95rem; font-weight: 600; color: var(--ink); margin: 0; }
+.lib-card__tag { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-mute); border: 1px solid var(--line); padding: 0.1rem 0.4rem; }
+.lib-card__desc { color: var(--ink-dim); font-size: 0.85rem; margin: 0.55rem 0 0; flex: 1; }
+.lib-card__install, .dl-row__install {
+  font-family: var(--font-mono); font-size: 0.76rem; color: var(--ink);
+  background: var(--paper-2); border: 1px solid var(--line); border-radius: 2px;
+  padding: 0.4rem 0.6rem; overflow-x: auto; white-space: nowrap;
+}
+.lib-card__install { display: block; margin: 0.9rem 0 0; }
+/* the row already carries a Get it button, so the command sits inline beside the text */
+.dl-row__install { display: inline-block; margin: 0.55rem 0 0; padding: 0.25rem 0.5rem; font-size: 0.72rem; }
+.lib-card__foot {
+  display: flex; align-items: baseline; gap: 1.1rem; margin-top: 0.85rem;
+  font-family: var(--font-mono); font-size: 0.7rem;
+}
+.lib-card__link { color: var(--accent-deep); }
+.lib-card__link:hover { color: var(--accent); }
+.lib-card__lic { margin-left: auto; color: var(--ink-mute); }
+
 /* =========================================================================
    DOWNLOADS — home strip; one row per tool, one button per platform
    ========================================================================= */
@@ -833,7 +881,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   .security__grid, .looking__grid { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 980px) {
-  .oss__list { grid-template-columns: 1fr; }
+  .oss__list, .lib-list, .oss-idx { grid-template-columns: 1fr; }
   .stats__grid { grid-template-columns: repeat(2, 1fr); }
   .stat { border-left: 0; border-top: 1px solid var(--line); }
   .stat:nth-child(even) { border-left: 1px solid var(--line); }

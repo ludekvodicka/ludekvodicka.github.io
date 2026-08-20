@@ -364,11 +364,14 @@
     });
   }
 
-  /* ---- open source — repo index --------------------------------------- */
+  /* ---- open source — repo index ---------------------------------------
+     Two tiers, one section: the `featured` repos get a full card, everything
+     else public gets one compact line underneath. Nothing is collapsed —
+     the point of the section is that the evidence is right there. */
   function renderOss() {
     const list = $("#ossList");
     if (!list || typeof OSS_REPOS === "undefined") return;
-    list.innerHTML = OSS_REPOS.map((r, i) => `
+    list.innerHTML = OSS_REPOS.filter((r) => r.featured).map((r, i) => `
       <a class="oss-row reveal" href="https://github.com/${OSS_GH_USER}/${r.repo}" target="_blank" rel="noopener" style="--d:${(i % 4) * 45}ms">
         <div class="oss-row__head">
           <h3 class="oss-row__name">${r.name}</h3>
@@ -379,6 +382,16 @@
         </div>
         <p class="oss-row__desc">${r.desc}</p>
         <span class="oss-row__go">view on GitHub ↗</span>
+      </a>`).join("");
+
+    const index = $("#ossIndex");
+    if (!index) return;
+    index.innerHTML = OSS_REPOS.filter((r) => !r.featured).map((r) => `
+      <a class="oss-idx__row" href="https://github.com/${OSS_GH_USER}/${r.repo}" target="_blank" rel="noopener">
+        <span class="oss-idx__name">${r.name}</span>
+        <span class="oss-idx__tag">${r.tag}</span>
+        <span class="oss-idx__desc">${firstSentence(r.desc)}</span>
+        <span class="oss-idx__lang" title="${r.lang}"><i style="background:${LANG_COLORS[r.lang] || "#64748b"}"></i><span class="sr-only">${r.lang}</span></span>
       </a>`).join("");
   }
 
@@ -416,13 +429,20 @@
           </a>`;
   }
 
-  function renderDownloads() {
-    const list = $("#downloadsList");
-    if (!list || typeof HOME === "undefined") return;
-    list.innerHTML = HOME.downloads.map((d, i) => {
+  /* Sections 01 and 02 are the same row, twice: the only difference is which
+     array feeds which mount. Anything that reasons about "a download row"
+     uses dlRows(), so a row moved between the two arrays keeps its buttons
+     on its detail page. */
+  const dlRows = () => (typeof HOME === "undefined" ? [] : (HOME.downloads || []).concat(HOME.tools || []));
+
+  function renderDownloads(mountSel, rows) {
+    const list = $(mountSel);
+    if (!list || typeof HOME === "undefined" || !rows) return;
+    list.innerHTML = rows.map((d, i) => {
+      const repo = d.repo ? OSS_REPOS.find((r) => r.repo === d.repo) : null;
       const src = d.project
         ? firstSentence((PROJECTS.find((p) => p.name === d.project) || { blurb: "" }).blurb)
-        : (OSS_REPOS.find((r) => r.repo === d.repo) || { desc: "" }).desc;
+        : (repo || { desc: "" }).desc;
       const actions = dlButtonsHTML(d);
       // one 160x100 box either way, so the left edge of the list never staggers
       const media = d.img
@@ -445,11 +465,38 @@
             <span class="dl-row__kind">${d.kind}</span>
           </div>
           <p class="dl-row__desc">${src}</p>
+          ${repo && repo.install ? `<code class="dl-row__install">${repo.install}</code>` : ""}
           ${goHtml}
         </div>
         <div class="dl-row__actions">${actions}</div>
       </article>`;
     }).join("");
+  }
+
+  /* ---- libraries (home) — npm packages, no images ----------------------
+     A card is built entirely from its OSS_REPOS entry, so HOME.libraries is
+     just a list of keys. An unresolved key is dropped rather than rendered
+     empty: a typo shortens the section instead of breaking it. */
+  function renderLibraries() {
+    const list = $("#libsList");
+    if (!list || typeof HOME === "undefined" || typeof OSS_REPOS === "undefined") return;
+    list.innerHTML = (HOME.libraries || [])
+      .map((key) => OSS_REPOS.find((r) => r.repo === key))
+      .filter(Boolean)
+      .map((r, i) => `
+      <article class="lib-card reveal" style="--d:${i * 45}ms">
+        <div class="lib-card__head">
+          <h3 class="lib-card__name">${r.npm}</h3>
+          <span class="lib-card__tag">${r.tag}</span>
+        </div>
+        <p class="lib-card__desc">${r.desc}</p>
+        <code class="lib-card__install">${r.install}</code>
+        <div class="lib-card__foot">
+          <a class="lib-card__link" href="https://www.npmjs.com/package/${r.npm}" target="_blank" rel="noopener">on npm ↗</a>
+          <a class="lib-card__link" href="https://github.com/${OSS_GH_USER}/${r.repo}" target="_blank" rel="noopener">source ↗</a>
+          <span class="lib-card__lic">${r.license}</span>
+        </div>
+      </article>`).join("");
   }
 
   /* Fills every [data-app-actions="<row name>"] mount on a detail page with the
@@ -459,7 +506,7 @@
     const mounts = $$("[data-app-actions]");
     if (!mounts.length || typeof HOME === "undefined") return;
     mounts.forEach((m) => {
-      const d = HOME.downloads.find((x) => x.name === m.dataset.appActions);
+      const d = dlRows().find((x) => x.name === m.dataset.appActions);
       if (!d) return;
       let html = "";
       if (d.store)
@@ -481,7 +528,7 @@
      hrefs that are already in the DOM, so there is nothing to report. */
   function upgradeDownloadLinks() {
     if (typeof HOME === "undefined" || !$("[data-dl]")) return;
-    HOME.downloads
+    dlRows()
       // only the repos whose buttons are on THIS page: a detail page costs one call
       .filter((d) => d.release && $(`[data-dl^="${d.release.repo}:"]`))
       .forEach((d) => {
@@ -701,7 +748,9 @@
     renderWorkshift();
     renderProcess(); renderStack();
     renderFilters(); renderProjects(); renderOss(); renderTimeline();
-    renderDownloads(); renderAppActions();
+    renderDownloads("#downloadsList", typeof HOME !== "undefined" ? HOME.downloads : null);
+    renderDownloads("#toolsList", typeof HOME !== "undefined" ? HOME.tools : null);
+    renderLibraries(); renderAppActions();
     initFilters(); initReveal(); initNav(); initRotator(); initSmoothScroll();
     const y = $("#year"); if (y) y.textContent = new Date().getFullYear();
     // installer links are a nice-to-have: fetch them once the page is on screen

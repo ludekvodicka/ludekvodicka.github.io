@@ -547,13 +547,21 @@ const PROJECTS = [
   },
 ];
 
-/* ---- Open source - my public repos ------------------------------------ */
+/* ---- Open source - my public repos -------------------------------------
+   `repo` is the join key: HOME rows and CV.ossRepos name a repo, never a
+   description. Optional fields:
+     featured  a full card in the CV's open-source section; the rest of the
+               list renders as the compact "Also public" index under it
+     npm       published package name - drives the npmjs.com link
+     install   the exact command, verbatim (keeps `-g` for the CLIs)
+     license   one word, shown on the home page's library cards            */
 const OSS_REPOS = [
   {
     repo: "jamat",
     name: "Jamat",
     lang: "TypeScript",
     tag: "flagship",
+    featured: true,
     desc: "Multi-agent terminal: many Claude Code & Codex sessions in one tiling workspace, across machines. MIT, installers for all three platforms.",
   },
   {
@@ -561,6 +569,7 @@ const OSS_REPOS = [
     name: "ScreenMCP",
     lang: "TypeScript",
     tag: "MCP server",
+    featured: true,
     desc: "Human-controlled desktop vision for AI agents: you pick the monitor, window or region. Localhost-only, bearer auth, redaction masks, audit trail.",
   },
   {
@@ -568,6 +577,10 @@ const OSS_REPOS = [
     name: "LocalGate",
     lang: "TypeScript",
     tag: "dev tool",
+    featured: true,
+    npm: "localgate",
+    install: "npm i -g localgate",
+    license: "Apache-2.0",
     desc: "Stable names for local dev servers: one proxy on port 80 routes every app by Host, and restart swaps the dev server without losing your terminal or debugger.",
   },
   {
@@ -575,6 +588,7 @@ const OSS_REPOS = [
     name: "MeetingRecorder",
     lang: "Python",
     tag: "tool",
+    featured: true,
     desc: "Dual-track meeting recorder (system audio + mic) with transcription, speaker labels, live translated subtitles and AI summaries.",
   },
   {
@@ -599,6 +613,36 @@ const OSS_REPOS = [
     desc: "The same bridge for TortoiseSVN, with multi-root workspace support.",
   },
   {
+    repo: "rmscene-ts",
+    name: "rmscene-ts",
+    lang: "TypeScript",
+    tag: "reMarkable · library",
+    npm: "rmscene-ts",
+    install: "npm i rmscene-ts",
+    license: "MIT",
+    desc: "Reads, writes and renders reMarkable .rm v6 scene files. A full TypeScript rewrite of the Python rmscene, golden-tested against it: no runtime dependencies, ESM, CommonJS and types, Node and the browser.",
+  },
+  {
+    repo: "rmcommunication-ts",
+    name: "rmcommunication-ts",
+    lang: "TypeScript",
+    tag: "reMarkable · library",
+    npm: "rmcommunication-ts",
+    install: "npm i rmcommunication-ts",
+    license: "MIT",
+    desc: "Talks to a reMarkable tablet over a pinned SSH tunnel on your own WiFi: list, download and upload documents, plus guarded backups, mirrors, templates and rendering. No cloud, typed operations only.",
+  },
+  {
+    repo: "remarkable-cli",
+    name: "remarkable-cli",
+    lang: "TypeScript",
+    tag: "reMarkable · CLI",
+    npm: "remarkable-cli",
+    install: "npm i -g remarkable-cli",
+    license: "MIT",
+    desc: "The rmcli command over rmscene-ts and rmcommunication-ts. A thin mapping: parse the arguments, call one library function, print the result.",
+  },
+  {
     repo: "ikamand",
     name: "ikamand",
     lang: "HTML",
@@ -609,12 +653,17 @@ const OSS_REPOS = [
 
 const OSS_GH_USER = "ludekvodicka";
 
-/* ---- Home page - the apps a visitor can install or clone today ---------
-   Each row names exactly one of `project` (joins PROJECTS by name) or `repo`
-   (joins OSS_REPOS by repo), so the description is never retyped here.
+/* ---- Home page - the three catalogue sections --------------------------
+   `downloads` (01 Apps) and `tools` (02 Tools) hold rows of the SAME shape,
+   rendered by the same function into two mounts: apps you install, then the
+   smaller things you install into your workflow. Each row names exactly one
+   of `project` (joins PROJECTS by name) or `repo` (joins OSS_REPOS by repo),
+   so the description is never retyped here.
    `release` marks a repo that publishes GitHub releases: the row renders one
    button per platform, and main.js upgrades them to direct asset URLs.
-   `img`/`alt` add a thumbnail; without them the row shows a `ph` tile.       */
+   `img`/`alt` add a thumbnail; without them the row shows a `ph` tile.
+   `libraries` (03 Libraries) is only a list of OSS_REPOS keys - a library
+   card has no data of its own beyond what OSS_REPOS already holds.          */
 const HOME = {
   downloads: [
     {
@@ -666,6 +715,8 @@ const HOME = {
       img: "assets/img/apps/vifito-desktop.webp",
       alt: "Vifito Desktop driving an infrared device, with the session chart",
     },
+  ],
+  tools: [
     {
       name: "LocalGate",
       repo: "LocalGate",
@@ -692,6 +743,7 @@ const HOME = {
       ph: "SVN",
     },
   ],
+  libraries: ["rmscene-ts", "rmcommunication-ts", "remarkable-cli"],
 };
 
 /* ---- Career evolution (now → roots) ----------------------------------- */
@@ -781,8 +833,9 @@ const CV = {
     infra: "Cloud & DevOps",
     foundation: "C++ & systems",
   },
-  /* whitelist of OSS_REPOS[].repo rendered in the Open Source section */
-  ossRepos: ["jamat", "ScreenMCP", "vscode-tortoise-git", "vscode-tortoise-svn"],
+  /* whitelist of OSS_REPOS[].repo rendered in the Open Source section - kept
+     in step with the `featured` repos on the CV page, so paper and web agree */
+  ossRepos: ["jamat", "ScreenMCP", "LocalGate", "MeetingRecorder"],
   education: [
     { period: "2004-2007", degree: "Master's degree, Applied Informatics",
       school: "Masaryk University, Faculty of Informatics, Brno" },
