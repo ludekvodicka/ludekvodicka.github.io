@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ludekvodicka.github.io/sitemap.xml
