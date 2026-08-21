@@ -633,6 +633,16 @@ const OSS_REPOS = [
     desc: "Talks to a reMarkable tablet over a pinned SSH tunnel on your own WiFi: list, download and upload documents, plus guarded backups, mirrors, templates and rendering. No cloud, typed operations only.",
   },
   {
+    repo: "rmindex-ts",
+    name: "rmindex-ts",
+    lang: "TypeScript",
+    tag: "reMarkable · library",
+    npm: "rmindex-ts",
+    install: "npm i rmindex-ts",
+    license: "MIT",
+    desc: "Turns a local reMarkable mirror into a searchable catalog: an SQLite index of documents and folders, FTS5 full-text search that matches Czech text with or without diacritics, and a cache of rendered page images. Reads the mirror only, no network and no credentials.",
+  },
+  {
     repo: "remarkable-cli",
     name: "remarkable-cli",
     lang: "TypeScript",
@@ -640,7 +650,7 @@ const OSS_REPOS = [
     npm: "remarkable-cli",
     install: "npm i -g remarkable-cli",
     license: "MIT",
-    desc: "The rmcli command over rmscene-ts and rmcommunication-ts. A thin mapping: parse the arguments, call one library function, print the result.",
+    desc: "The rmcli command over rmscene-ts, rmcommunication-ts and rmindex-ts. A thin mapping: parse the arguments, call one library function, print the result.",
   },
   {
     repo: "ikamand",
@@ -743,7 +753,7 @@ const HOME = {
       ph: "SVN",
     },
   ],
-  libraries: ["rmscene-ts", "rmcommunication-ts", "remarkable-cli"],
+  libraries: ["rmscene-ts", "rmcommunication-ts", "rmindex-ts", "remarkable-cli"],
 };
 
 /* ---- Career evolution (now → roots) ----------------------------------- */
