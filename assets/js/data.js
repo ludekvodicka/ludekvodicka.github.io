@@ -702,7 +702,8 @@ const HOME = {
       kind: "Windows preview · installer",
       url: "https://github.com/ludekvodicka/DesktopAiAssistant/releases/latest",
       detail: "https://github.com/ludekvodicka/DesktopAiAssistant",
-      ph: "AI",
+      img: "assets/img/apps/aiassistant.webp",
+      alt: "Desktop AI Assistant's action ring with translation, explanation and source submenus",
     },
     {
       name: "Jamat",
