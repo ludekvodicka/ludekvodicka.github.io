@@ -307,6 +307,18 @@ const PROJECTS = [
     links: [{ label: "github.com/ludekvodicka/ScreenMCP", url: "https://github.com/ludekvodicka/ScreenMCP" }],
   },
   {
+    name: "Desktop AI Assistant",
+    cat: "ai",
+    detail: "https://github.com/ludekvodicka/DesktopAiAssistant",
+    flag: "Open source · MIT · Windows preview",
+    metric: "Actions at the cursor",
+    blurb:
+      "A Windows action ring for AI text editing, translation, explanations and macros in the apps I already use. It runs an installed, signed-in Claude or Codex CLI, checks the original editor before inserting a result, and keeps a history for review and restore. Configurable submenus and per-app profiles keep shortcuts close to the cursor; an optional Chrome and Edge extension connects supported browser fields. Editor compatibility varies.",
+    tech: ["Python", "PySide6", "Qt Quick", "Windows UI Automation", "Browser extension", "Claude / Codex CLI"],
+    highlight: "Windows installer · automatic updates · configurable action ring",
+    links: [{ label: "github.com/ludekvodicka/DesktopAiAssistant", url: "https://github.com/ludekvodicka/DesktopAiAssistant" }],
+  },
+  {
     name: "Local Voice-to-Text",
     cat: "ai",
     flag: "Open source · personal tool",
@@ -592,6 +604,14 @@ const OSS_REPOS = [
     desc: "Dual-track meeting recorder (system audio + mic) with transcription, speaker labels, live translated subtitles and AI summaries.",
   },
   {
+    repo: "DesktopAiAssistant",
+    name: "Desktop AI Assistant",
+    lang: "Python",
+    tag: "AI desktop tool",
+    license: "MIT",
+    desc: "Windows action ring for AI text editing, translation, explanations and macros, powered by an installed Claude or Codex CLI. Configurable app profiles, history and optional Chrome / Edge integration. Windows preview; editor compatibility varies.",
+  },
+  {
     repo: "VifitoDesktop",
     name: "VifitoDesktop",
     lang: "TypeScript",
@@ -676,6 +696,14 @@ const OSS_GH_USER = "ludekvodicka";
    card has no data of its own beyond what OSS_REPOS already holds.          */
 const HOME = {
   downloads: [
+    {
+      name: "Desktop AI Assistant",
+      project: "Desktop AI Assistant",
+      kind: "Windows preview · installer",
+      url: "https://github.com/ludekvodicka/DesktopAiAssistant/releases/latest",
+      detail: "https://github.com/ludekvodicka/DesktopAiAssistant",
+      ph: "AI",
+    },
     {
       name: "Jamat",
       project: "Jamat",
